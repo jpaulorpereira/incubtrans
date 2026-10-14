@@ -5,7 +5,7 @@ const { translator, pick, isFallback, LANGS } = require('./i18n');
 const { sessionMiddleware, csrfToken, csrfCheck } = require('./lib/security');
 const U = require('./lib/util');
 const { UPLOAD_DIR, ratingOf } = require('./lib/repo');
-const { BASE_URL } = require('./lib/mail');
+const { BASE_URL, mailProvider } = require('./lib/mail');
 
 // Primeiro arranque: carrega os dados de demonstração
 const { seed, isEmpty } = require('./seed');
@@ -79,6 +79,7 @@ app.use((req, res, next) => {
   L.U = U;
   Object.assign(L, require('./lib/icons'));
   L.baseUrl = BASE_URL();
+  L.mailProvider = mailProvider();
   L.consentMaps = req.cookies.consent === 'maps';
   L.consentSet = !!req.cookies.consent;
   L.flash = req.session.flash || null;

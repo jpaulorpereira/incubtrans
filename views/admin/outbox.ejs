@@ -1,11 +1,15 @@
 <%- include('_head') %>
 <section class="card pad">
   <h2 style="font-size:21px"><%= t('admin.tabs.caixa') %></h2>
-  <p class="muted" style="margin:6px 0 16px"><%= tr('Nesta versão os emails ficam registados aqui (não há servidor SMTP configurado). As ligações de confirmação podem ser abertas diretamente para testar os fluxos.', 'En esta versión los emails quedan registrados aquí (no hay servidor SMTP configurado). Los enlaces de confirmación se pueden abrir directamente para probar los flujos.') %></p>
+  <% if (mailProvider) { %>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Envio de emails ativo (' + mailProvider.toUpperCase() + '). Todas as mensagens ficam também registadas aqui, com o estado do envio.', 'Envío de emails activo (' + mailProvider.toUpperCase() + '). Todos los mensajes quedan también registrados aquí, con el estado del envío.') %></p>
+  <% } else { %>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Não há serviço de envio configurado: os emails ficam só registados aqui. As ligações de confirmação podem ser abertas diretamente para testar os fluxos.', 'No hay servicio de envío configurado: los emails solo quedan registrados aquí. Los enlaces de confirmación se pueden abrir directamente para probar los flujos.') %></p>
+  <% } %>
   <% if (!rows.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
   <% rows.forEach(m => { %>
-    <details class="box"><summary><span class="tiny muted" style="white-space:nowrap"><%= U.formatDate(m.created_at) %> <%= String(m.created_at).slice(11, 16) %></span> <b><%= m.subject %></b> <span class="muted small">→ <%= m.to_email %></span></summary>
-      <div class="in"><pre class="mail"><%- String(m.body).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>') %></pre></div></details>
+    <details class="box"><summary><span class="tiny muted" style="white-space:nowrap"><%= U.formatDate(m.created_at) %> <%= String(m.created_at).slice(11, 16) %></span> <b><%= m.subject %></b> <span class="muted small">→ <%= m.to_email %></span> <% if (m.status === 'enviado') { %><span class="pill aprovada"><%= tr('enviado', 'enviado') %></span><% } else if (m.status === 'erro') { %><span class="pill rejeitada" title="<%= m.error %>"><%= tr('erro', 'error') %></span><% } %></summary>
+      <div class="in"><% if (m.error) { %><p class="small" style="color:#B42318"><%= m.error %></p><% } %><pre class="mail"><%- String(m.body).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>') %></pre></div></details>
   <% }) %>
 </section>
 <%- include('_foot') %>

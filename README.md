@@ -38,6 +38,9 @@ O painel de administração está em `/gestao` e não aparece na navegação pú
 | `DATA_DIR` | Pasta da base de dados e das imagens carregadas | `./data` |
 | `HIGHLIGHT_DAYS` | Duração de um destaque, em dias | 30 |
 | `NODE_ENV` | Em `production`, os cookies ficam marcados como `Secure` | — |
+| `MAIL_FROM` | Endereço remetente dos emails (tem de estar validado no serviço de envio) | — |
+| `MAIL_FROM_NAME` | Nome do remetente | Marketplace INCUBTRANS |
+| `BREVO_API_KEY` | Chave da API da Brevo. Envia por HTTPS, o que funciona mesmo onde as portas SMTP estão bloqueadas, como no plano gratuito do Render | — |
 
 ## O que está feito
 
@@ -81,7 +84,7 @@ Requisitos não funcionais:
 
 ## O que falta para produção
 
-- **Envio real de emails.** Hoje todos os emails ficam na "Caixa de saída" do painel de administração. Falta ligar um servidor SMTP ou um serviço de envio no ficheiro `src/lib/mail.js`.
+- **Envio real de emails.** Fica ativo quando se definem `MAIL_FROM` e `BREVO_API_KEY`. Sem estas variáveis, os emails ficam só na "Caixa de saída" do painel de administração, que mostra sempre o estado de cada envio. Em produção, convém usar um domínio próprio com SPF e DKIM.
 - **Alojamento, HTTPS e cópias de segurança diárias (RNF-07, RNF-09).** Também falta decidir quem aloja e mantém a plataforma.
 - **Auditoria de acessibilidade WCAG 2.1 AA.** A base é semântica e acessível, mas não foi feita uma auditoria formal.
 - **Decisões em aberto da especificação.** Estão ainda por decidir os limites finais de imagens e de produtos e os textos legais definitivos.
