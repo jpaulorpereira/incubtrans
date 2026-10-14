@@ -101,7 +101,7 @@ app.use((req, res, next) => {
     const p = new URLSearchParams();
     Object.entries({ ...req.query, ...changes }).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') p.set(k, v); });
     const s = p.toString();
-    return req.path + (s ? `?${s}` : '');
+    return req.originalUrl.split('?')[0] + (s ? `?${s}` : '');
   };
   // Texto simples com "## títulos" e "- listas" (páginas institucionais)
   L.md = (text) => {

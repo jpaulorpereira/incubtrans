@@ -219,3 +219,10 @@ test('incubadora gere programas e eventos; aparecem na página pública', async 
   assert.match(r.text, /Programa Raia Verde/); assert.match(r.text, /Feira de startups/); assert.match(r.text, /9 meses/);
   assert.equal((await c.get('/area/projetos')).status, 403);
 });
+
+test('filtros da gestão mantêm o endereço /gestao', async () => {
+  const a = client(); await a.login('admin@incubtrans.eu', 'Admin2026!');
+  const r = await a.get('/gestao/contas');
+  assert.match(r.text, /href="\/gestao\/contas\?estado=aprovada"/);
+  assert.doesNotMatch(r.text, /href="\/contas\?/);
+});
