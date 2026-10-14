@@ -1,0 +1,14 @@
+<%- include('partials/head', { band: { title: pick(p, 'title') } }) %>
+<div class="wrap page" style="max-width:900px">
+  <article class="card" style="padding:40px">
+    <div class="prose"><%- md(pick(p, 'body')) %></div>
+    <p class="tiny muted" style="margin-top:26px"><%= lang === 'es' ? 'Última actualización' : 'Última atualização' %>: <%= U.formatDate(p.updated_at) %></p>
+  </article>
+  <% if (partners) { %>
+    <div class="cta-band" style="margin-top:26px">
+      <div class="cta-box"><h3><%= lang === 'es' ? 'Forma parte de la red INCUBTRANS' : 'Faça parte da rede INCUBTRANS' %></h3><p><%= t('home.ctaEmpresaS') %></p><a class="btn" href="/registo"><%= t('btn.registar') %> →</a></div>
+      <div class="cta-box alt"><h3><%= t('contact.band') %></h3><p><%= t('contact.sub') %></p><a class="btn" href="/contactos"><%= t('foot.contactos') %> →</a></div>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

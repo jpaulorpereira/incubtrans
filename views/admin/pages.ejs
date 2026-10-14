@@ -1,0 +1,47 @@
+<%- include('_head') %>
+<div class="grid2" style="grid-template-columns:1fr 1.4fr;align-items:start">
+  <section class="card pad">
+    <div class="row between"><h2 style="font-size:20px"><%= t('admin.tabs.paginas') %></h2><a class="btn sm" href="?nova=1#editor"><%- icon('plus', 14) %> <%= tr('Nova página', 'Nueva página') %></a></div>
+    <% pages.forEach(p => { %>
+      <div class="item-row row between" style="margin-top:10px">
+        <div><b><%= p.title_pt %></b><div class="tiny muted">/<%= ['sobre', 'como-funciona', 'termos', 'privacidade'].includes(p.slug) ? p.slug : 'p/' + p.slug %> · <%= U.formatDate(p.updated_at) %> · <span class="pill <%= p.published ? 'ativo' : 'inativo' %>"><%= p.published ? tr('Publicada', 'Publicada') : tr('Rascunho', 'Borrador') %></span><%= p.body_es ? '' : ' · ' + tr('sem ES', 'sin ES') %></div></div>
+        <div class="row" style="gap:6px"><a class="btn ghost sm" href="?editar=<%= p.slug %>#editor"><%= t('btn.editar') %></a>
+          <% if (!['sobre', 'como-funciona', 'termos', 'privacidade'].includes(p.slug)) { %><form method="post" action="/gestao/paginas/<%= p.slug %>/eliminar" class="inline js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= t('btn.eliminar') %></button></form><% } %></div>
+      </div>
+    <% }) %>
+  </section>
+  <% if (edit) { %>
+  <form class="card pad" id="editor" method="post" action="/gestao/paginas">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <h2 style="font-size:20px;margin-bottom:6px"><%= edit.slug ? tr('Editar página', 'Editar página') : tr('Nova página', 'Nueva página') %></h2>
+    <p class="help" style="margin-bottom:14px"><%= tr('Formato simples: linhas começadas por "## " são títulos e por "- " são listas.', 'Formato simple: las líneas que empiezan por "## " son títulos y por "- " son listas.') %></p>
+    <div class="field"><label class="l" for="pg-s"><%= tr('Endereço (slug)', 'Dirección (slug)') %></label><input class="input" id="pg-s" name="slug" value="<%= edit.slug %>" <%= edit.slug ? 'readonly' : '' %>></div>
+    <div class="fields2">
+      <div class="field"><label class="l" for="pg-tp"><%= tr('Título', 'Título') %> (PT)</label><input class="input" id="pg-tp" name="title_pt" value="<%= edit.title_pt || '' %>" required></div>
+      <div class="field"><label class="l" for="pg-te"><%= tr('Título', 'Título') %> (ES)</label><input class="input" id="pg-te" name="title_es" value="<%= edit.title_es || '' %>"></div>
+    </div>
+    <div class="field"><label class="l" for="pg-bp"><%= tr('Conteúdo', 'Contenido') %> (PT)</label><textarea class="input" id="pg-bp" name="body_pt" required style="min-height:220px"><%= edit.body_pt || '' %></textarea></div>
+    <div class="field"><label class="l" for="pg-be"><%= tr('Conteúdo', 'Contenido') %> (ES)</label><textarea class="input" id="pg-be" name="body_es" style="min-height:220px"><%= edit.body_es || '' %></textarea></div>
+    <label class="check" style="margin-bottom:16px"><input type="checkbox" name="published" value="1" <%= edit.published ? 'checked' : '' %>> <%= tr('Publicada', 'Publicada') %></label>
+    <div class="row"><button class="btn"><%= t('btn.guardar') %></button><a class="btn light" href="/gestao/paginas"><%= t('btn.cancelar') %></a></div>
+  </form>
+  <% } else { %><div class="card pad muted"><%= tr('Escolha uma página para editar.', 'Elige una página para editar.') %></div><% } %>
+</div>
+<section class="card pad" id="faq" style="margin-top:24px">
+  <h2 style="font-size:20px;margin-bottom:14px"><%= tr('Perguntas frequentes (FAQ)', 'Preguntas frecuentes (FAQ)') %></h2>
+  <% faqs.concat([{ id: '', q_pt: '', a_pt: '', q_es: '', a_es: '', sort: faqs.length }]).forEach(f => { %>
+    <details class="box" <%= f.id ? '' : 'open' %>><summary><%= f.id ? f.q_pt : '+ ' + tr('Nova pergunta', 'Nueva pregunta') %></summary><div class="in">
+      <form method="post" action="/gestao/faqs"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= f.id %>">
+        <div class="fields2">
+          <div class="field"><label class="l">PT — <%= tr('pergunta', 'pregunta') %></label><input class="input" name="q_pt" value="<%= f.q_pt %>" required></div>
+          <div class="field"><label class="l">ES — <%= tr('pergunta', 'pregunta') %></label><input class="input" name="q_es" value="<%= f.q_es || '' %>"></div>
+          <div class="field"><label class="l">PT — <%= tr('resposta', 'respuesta') %></label><textarea class="input" name="a_pt" required><%= f.a_pt %></textarea></div>
+          <div class="field"><label class="l">ES — <%= tr('resposta', 'respuesta') %></label><textarea class="input" name="a_es"><%= f.a_es || '' %></textarea></div>
+        </div>
+        <div class="row"><input class="input" name="sort" type="number" value="<%= f.sort %>" style="max-width:90px" aria-label="<%= tr('Ordem', 'Orden') %>"><button class="btn sm"><%= t('btn.guardar') %></button></div>
+      </form>
+      <% if (f.id) { %><form method="post" action="/gestao/faqs/<%= f.id %>/eliminar" class="js-confirm" data-confirm="<%= t('area.confirmEliminar') %>" style="margin-top:8px"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= t('btn.eliminar') %></button></form><% } %>
+    </div></details>
+  <% }) %>
+</section>
+<%- include('_foot') %>

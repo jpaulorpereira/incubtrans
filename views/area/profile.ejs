@@ -1,0 +1,87 @@
+<%- include('_head') %>
+<% const e = entity; const isEmp = role === 'empresa'; %>
+<form method="post" action="/area/perfil?_csrf=<%= csrf %>" enctype="multipart/form-data" class="stack">
+  <section class="card pad">
+    <h2 style="font-size:20px;margin-bottom:18px"><%= t('area.dadosEntidade') %></h2>
+    <div class="fields2">
+      <div class="field"><label class="l" for="p-n"><%= t('area.nome') %></label><input class="input" id="p-n" name="name" value="<%= e.name %>" required maxlength="160"></div>
+      <div class="field"><label class="l" for="p-s"><%= lang === 'es' ? 'Nombre corto / sigla' : 'Nome curto / sigla' %> <span class="muted">(<%= t('lbl.opcional') %>)</span></label><input class="input" id="p-s" name="short_name" value="<%= e.short_name || '' %>" maxlength="60"></div>
+      <% if (isEmp) { %>
+        <div class="field"><label class="l" for="p-c"><%= t('area.setor') %></label><select class="input" id="p-c" name="category_id"><option value=""><%= t('area.escolher') %></option><% cats.forEach(c => { %><option value="<%= c.id %>" <%= e.category_id === c.id ? 'selected' : '' %>><%= lang === 'es' ? c.name_es : c.name_pt %></option><% }) %></select></div>
+        <div class="field"><label class="l" for="p-nif"><%= t('auth.nif') %></label><input class="input" id="p-nif" name="nif" value="<%= e.nif || '' %>" maxlength="30"><p class="help"><%= lang === 'es' ? 'Cambiar el nombre, el NIF/CIF o la dirección exige nueva validación del sello.' : 'Alterar o nome, o NIF/CIF ou a morada exige nova validação do selo.' %></p></div>
+      <% } %>
+      <div class="field"><label class="l" for="p-y"><%= t('area.ano') %></label><input class="input" id="p-y" name="year" type="number" min="1800" max="2100" value="<%= e.year || '' %>"></div>
+      <% if (role === 'incubadora') { %><div class="field"><label class="l" for="p-st"><%= t('lbl.startupsInc') %></label><input class="input" id="p-st" name="startups" type="number" min="0" value="<%= e.startups || '' %>"></div><% } %>
+    </div>
+    <div class="field"><label class="l" for="p-dpt"><%= t('area.descricao') %> (PT)</label><textarea class="input" id="p-dpt" name="desc_pt" maxlength="4000"><%= e.desc_pt || '' %></textarea></div>
+    <div class="field"><label class="l" for="p-des"><%= t('area.descricao') %> (ES) <span class="muted">(<%= t('lbl.opcional') %>)</span></label><textarea class="input" id="p-des" name="desc_es" maxlength="4000"><%= e.desc_es || '' %></textarea><p class="help"><%= lang === 'es' ? 'Si no hay traducción, se muestra el texto original.' : 'Se não houver tradução, é apresentado o texto original.' %></p></div>
+    <% if (!isEmp) { %>
+      <div class="field"><label class="l" for="p-a"><%= role === 'incubadora' ? t('lbl.especializacoes') : t('lbl.areasAtuacao') %></label><input class="input" id="p-a" name="areas" value="<%= e.areas.join(', ') %>"><p class="help"><%= t('area.areasAj') %></p></div>
+      <% if (role === 'incubadora') { %><div class="field"><label class="l" for="p-sv"><%= t('lbl.servicos') %></label><input class="input" id="p-sv" name="services" value="<%= e.services.join(', ') %>"><p class="help"><%= lang === 'es' ? 'Ej.: Acompañamiento, Cowork, Aceleración, Acceso a financiación' : 'Ex.: Acompanhamento, Cowork, Aceleração, Acesso a financiamento' %></p></div><% } %>
+      <% if (role === 'agente') { %>
+        <div class="fields2">
+          <div class="field"><label class="l" for="p-sp"><%= t('area.apoio') %> (PT)</label><textarea class="input" id="p-sp" name="support_pt" maxlength="2000"><%= e.support_pt || '' %></textarea></div>
+          <div class="field"><label class="l" for="p-se"><%= t('area.apoio') %> (ES)</label><textarea class="input" id="p-se" name="support_es" maxlength="2000"><%= e.support_es || '' %></textarea></div>
+        </div>
+      <% } %>
+    <% } else { %><input type="hidden" name="areas" value="<%= e.areas.join(', ') %>"><% } %>
+    <div class="fields2">
+      <div class="field"><span class="l"><%= t('area.logo') %></span>
+        <div class="row"><div class="logo-box"><% if (e.logo) { %><img src="<%= e.logo %>" alt=""><% } else { %><span class="ini"><%= U.initials(e.name) %></span><% } %></div>
+        <div><input type="file" name="logo" accept="image/jpeg,image/png,image/webp" aria-label="<%= t('area.logo') %>"><% if (e.logo) { %><label class="check tiny" style="margin-top:6px"><input type="checkbox" name="remove_logo" value="1"> <%= t('area.removerImg') %></label><% } %></div></div></div>
+      <div class="field"><span class="l"><%= t('area.capa') %></span>
+        <div><% if (e.cover) { %><img src="<%= e.cover %>" alt="" style="max-height:70px;border-radius:10px;display:block;margin-bottom:6px"><% } %><input type="file" name="cover" accept="image/jpeg,image/png,image/webp" aria-label="<%= t('area.capa') %>"><% if (e.cover) { %><label class="check tiny" style="margin-top:6px"><input type="checkbox" name="remove_cover" value="1"> <%= t('area.removerImg') %></label><% } %></div></div>
+    </div>
+    <p class="help"><%= t('area.imagensAj') %></p>
+  </section>
+
+  <section class="card pad">
+    <h2 style="font-size:20px;margin-bottom:18px"><%= t('area.contactos') %></h2>
+    <div class="fields3">
+      <div class="field"><label class="l" for="p-ph"><%= lang === 'es' ? 'Teléfono' : 'Telefone' %></label><input class="input" id="p-ph" name="phone" value="<%= e.phone || '' %>" autocomplete="tel"></div>
+      <div class="field"><label class="l" for="p-em"><%= t('auth.email') %></label><input class="input" id="p-em" name="email" type="email" value="<%= e.email || '' %>"></div>
+      <div class="field"><label class="l" for="p-w"><%= t('area.website') %></label><input class="input" id="p-w" name="website" value="<%= e.website || '' %>" placeholder="https://"></div>
+    </div>
+    <div class="label"><%= t('area.redes') %></div>
+    <div id="socials">
+      <% (e.socials.length ? e.socials : [{ net: 'Facebook', url: '' }]).forEach(s => { %>
+        <div class="row js-row" style="margin-bottom:10px;flex-wrap:nowrap">
+          <select class="input" name="social_net" style="max-width:200px" aria-label="<%= t('area.redes') %>"><% SOCIAL_NETS.forEach(n => { %><option <%= s.net === n ? 'selected' : '' %>><%= n %></option><% }) %></select>
+          <input class="input" name="social_url" value="<%= s.url %>" placeholder="https://" aria-label="URL">
+          <button type="button" class="btn danger sm js-rm" aria-label="<%= t('btn.eliminar') %>">✕</button>
+        </div>
+      <% }) %>
+    </div>
+    <button type="button" class="btn light sm js-add" data-target="socials"><%- icon('plus', 14) %> <%= t('btn.adicionar') %></button>
+    <hr class="divider">
+    <div class="fields2">
+      <div class="field"><label class="l" for="p-cp"><%= t('area.pessoa') %> <span class="muted">(<%= t('lbl.opcional') %>)</span></label><input class="input" id="p-cp" name="contact_person" value="<%= e.contact_person || '' %>"></div>
+      <div class="field" style="align-self:end"><label class="check"><input type="checkbox" name="contact_person_public" value="1" <%= e.contact_person_public ? 'checked' : '' %>> <%= t('area.pessoaPublica') %></label></div>
+    </div>
+  </section>
+
+  <section class="card pad">
+    <h2 style="font-size:20px;margin-bottom:6px"><%= t('area.localizacoes') %></h2>
+    <p class="help" style="margin-bottom:16px"><%= lang === 'es' ? 'País, distrito/provincia y concelho/concello según la taxonomía común; se usan en los filtros y en el mapa.' : 'País, distrito/província e concelho/concello segundo a taxonomia comum; são usados nos filtros e no mapa.' %></p>
+    <div id="locs">
+      <% (e.locations.length ? e.locations : [{}]).forEach(l => { %>
+        <div class="repeat js-row">
+          <button type="button" class="btn danger sm rm js-rm" aria-label="<%= t('btn.eliminar') %>">✕</button>
+          <div class="fields2">
+            <div class="field"><label class="l"><%= t('area.territorio') %></label>
+              <select class="input" name="loc_territory"><option value=""><%= t('area.escolher') %></option>
+                <% let grp = null; territories.forEach(tt => { const g = `${country(tt.country)} · ${tt.region}`; if (g !== grp) { if (grp) { %></optgroup><% } grp = g; %><optgroup label="<%= g %>"><% } %><option value="<%= tt.id %>" <%= l.territory_id === tt.id ? 'selected' : '' %>><%= tt.municipality %></option><% }); if (grp) { %></optgroup><% } %>
+              </select></div>
+            <div class="field"><label class="l"><%= t('area.morada') %></label><input class="input" name="loc_address" value="<%= l.address || '' %>"></div>
+            <div class="field"><label class="l"><%= lang === 'es' ? 'Teléfono' : 'Telefone' %></label><input class="input" name="loc_phone" value="<%= l.phone || '' %>"></div>
+            <div class="field"><label class="l"><%= t('auth.email') %></label><input class="input" name="loc_email" value="<%= l.email || '' %>"></div>
+          </div>
+          <div class="field" style="margin-bottom:0"><label class="l"><%= t('area.coordenadas') %></label><input class="input" name="loc_coords" value="<%= l.lat != null ? `${l.lat}, ${l.lng}` : '' %>" placeholder="41.7401, -7.4685" style="max-width:300px"><p class="help"><%= t('area.coordAj') %></p></div>
+        </div>
+      <% }) %>
+    </div>
+    <button type="button" class="btn light sm js-add" data-target="locs"><%- icon('plus', 14) %> <%= t('area.addLocal') %></button>
+  </section>
+  <div><button class="btn" style="padding:15px 30px"><%= t('btn.guardarAlt') %></button></div>
+</form>
+<%- include('_foot') %>

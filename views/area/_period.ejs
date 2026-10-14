@@ -1,0 +1,4 @@
+<div class="card row between" style="padding:12px 18px;margin-bottom:20px">
+  <span class="small"><span class="dot" style="background:var(--ok)"></span><b><%= lang === 'es' ? 'Estadísticas de la plataforma' : 'Estatísticas da plataforma' %></b> <span class="muted">· <%= lang === 'es' ? 'sin cookies ni datos personales de los visitantes' : 'sem cookies nem dados pessoais dos visitantes' %></span></span>
+  <div class="seg"><% periods.forEach(d => { %><a href="?periodo=<%= d %>" class="<%= stats.days === d ? 'on' : '' %>"><%= d %> <%= t('lbl.dias') %></a><% }) %></div>
+</div>

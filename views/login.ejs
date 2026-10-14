@@ -1,0 +1,30 @@
+<%- include('partials/head', { band: { title: lang === 'es' ? 'Accesos' : 'Acessos', sub: t('auth.loginS') } }) %>
+<div class="wrap page">
+  <div class="grid2" style="align-items:start">
+    <form class="card" style="padding:36px" method="post" action="/entrar">
+      <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="next" value="<%= next %>">
+      <h2 style="font-size:26px"><%= t('auth.loginT') %></h2>
+      <p class="muted" style="margin:8px 0 26px"><%= t('auth.loginS') %></p>
+      <% if (err) { %><div class="alert error" role="alert"><%= err %></div><% } %>
+      <div class="field"><label class="l" for="li-e"><%= t('auth.email') %></label><input class="input" id="li-e" name="email" type="email" value="<%= email %>" required autocomplete="username" autofocus></div>
+      <div class="field"><label class="l" for="li-p"><%= t('auth.password') %></label><input class="input" id="li-p" name="password" type="password" required autocomplete="current-password"></div>
+      <button class="btn block" style="padding:15px"><%= t('btn.entrar') %></button>
+      <div class="grid2" style="gap:12px;margin-top:14px">
+        <a class="btn light" href="/registo"><%= t('btn.registar') %></a>
+        <a class="btn light" href="/recuperar"><%= t('btn.recuperar') %></a>
+      </div>
+    </form>
+    <div>
+      <h2 style="font-size:24px"><%= t('auth.semConta') %></h2>
+      <p class="muted" style="margin:8px 0 22px"><%= t('auth.registoS') %></p>
+      <% [['empresa', 'store', 'perfilEmpresa', 'perfilEmpresaD'], ['incubadora', 'building', 'perfilIncub', 'perfilIncubD'], ['agente', 'users', 'perfilAgente', 'perfilAgenteD']].forEach(([r, ic, l, d]) => { %>
+        <a class="card row" href="/registo?perfil=<%= r %>" style="padding:20px 22px;margin-bottom:14px;color:inherit;flex-wrap:nowrap">
+          <span class="stat" style="padding:0;box-shadow:none"><span class="ico" style="margin:0"><%- icon(ic, 21) %></span></span>
+          <span><b style="font-family:var(--display);font-size:17px"><%= t('auth.' + l) %></b><br><span class="small muted"><%= t('auth.' + d) %></span></span>
+          <span style="margin-left:auto;color:#8A97AD">›</span>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

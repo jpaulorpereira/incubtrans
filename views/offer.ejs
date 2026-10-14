@@ -1,0 +1,51 @@
+<% const ttl = pick(o, 'title'); const jsonld = { '@context': 'https://schema.org', '@type': o.kind === 'servico' ? 'Service' : 'Product', name: ttl, description: pick(o, 'desc'), image: o.images.map(i => baseUrl + i), category: catName(o), [o.kind === 'servico' ? 'provider' : 'brand']: { '@type': 'Organization', name: seller.name, url: `${baseUrl}/empresas/${seller.slug}` }, ...(o.price_cents != null && o.kind !== 'servico' ? { offers: { '@type': 'Offer', price: (o.price_cents / 100).toFixed(2), priceCurrency: 'EUR' } } : {}) }; %>
+<%- include('partials/head', { band: { title: t('nav.produtos'), back: [lang === 'es' ? 'Volver a Productos' : 'Voltar aos Produtos', '/produtos'] }, metaDesc: pick(o, 'desc'), ogImage: o.images[0], jsonld }) %>
+<div class="wrap page">
+  <div class="detail">
+    <div>
+      <article class="card">
+        <div class="gallery">
+          <div class="main">
+            <% if (o.images[0]) { %><img src="<%= o.images[0] %>" alt="<%= ttl %>" id="gal-main"><% } else { %><div class="ph" aria-hidden="true"><%= U.initials(ttl) %></div><% } %>
+            <% if (o.isFeatured) { %><span class="badge-promo"><%= t('lbl.destaque') %></span><% } %>
+            <span class="badge-kind"><%= kindLabel(o.kind) %></span>
+          </div>
+          <% if (o.images.length > 1) { %><div class="strip"><% o.images.forEach((src, i) => { %><button type="button" class="js-thumb <%= i === 0 ? 'on' : '' %>" data-src="<%= src %>" aria-label="<%= i + 1 %>/<%= o.images.length %>"><img src="<%= src %>" alt=""></button><% }) %></div><% } %>
+        </div>
+        <div style="padding:28px">
+          <div class="row between" style="align-items:flex-start;gap:18px">
+            <h1 style="font-size:28px"><%= ttl %></h1>
+            <div class="price" style="font-size:24px"><%= priceLabel(o) %></div>
+          </div>
+          <div class="muted small" style="margin-top:8px"><%= t('lbl.publicado') %> <%= U.formatDate(o.created_at) %><% if (catName(o)) { %> · <a href="/produtos?categoria=<%= o.category_id %>"><%= catName(o) %></a><% } %></div>
+          <% if (isFallback(o, 'desc')) { %><p class="tiny muted" style="margin-top:12px"><%= t('lbl.original') %></p><% } %>
+          <div style="color:var(--ink-2);font-size:15.5px;line-height:1.65;margin-top:16px;white-space:pre-line"><%= pick(o, 'desc') %></div>
+          <% if (o.tags.length) { %><div class="label" style="margin-top:22px"><%= t('lbl.tags') %></div><div class="chips"><% o.tags.forEach(tag => { %><a class="chip lg" href="/produtos?q=<%= encodeURIComponent(tag) %>"><%= tag %></a><% }) %></div><% } %>
+          <p style="margin-top:22px"><a class="tiny muted" href="/denunciar/oferta/<%= o.id %>?voltar=<%= encodeURIComponent(path) %>" rel="nofollow"><%- icon('flag', 13) %> <%= t('btn.denunciar') %></a></p>
+        </div>
+      </article>
+      <%- include('partials/reviews', { reviews, rating }) %>
+    </div>
+    <aside class="side">
+      <div class="card pad">
+        <h2 style="font-size:20px"><%= t('lbl.infoVendedor') %></h2>
+        <div class="row" style="margin:18px 0 0;flex-wrap:nowrap">
+          <% if (seller.logo) { %><div class="logo-box"><img src="<%= seller.logo %>" alt=""></div><% } else { %><div class="avatar lg" aria-hidden="true"><%= U.initials(seller.short_name || seller.name) %></div><% } %>
+          <div>
+            <div class="row" style="gap:8px"><b style="font-family:var(--display);font-size:17px"><%= seller.name %></b><% if (seller.isVerified) { %><span class="verified" title="<%= t('lbl.verificadoEm') %> <%= U.formatDate(seller.verified_at) %>"><%- icon('check', 12) %> <%= t('lbl.verificado') %></span><% } %></div>
+            <div class="muted small"><%- icon('pin', 13) %> <%= seller.mainLoc ? `${seller.mainLoc.municipality}, ${country(seller.mainLoc.country)}` : '' %></div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="label" style="margin-top:0"><%= t('lbl.infoContacto') %></div>
+        <%- include('partials/contacts', { e: seller, offerId: o.id }) %>
+        <a class="btn ghost block" style="margin-top:12px" href="/empresas/<%= seller.slug %>"><%= t('lbl.verEmpresa') %> →</a>
+      </div>
+      <%- include('partials/review-form', { e: seller, captcha }) %>
+    </aside>
+  </div>
+  <% if (related.length) { %>
+    <section class="sec"><div class="sec-head"><h2><%= t('lbl.relacionados') %></h2></div><div class="grid3"><% related.forEach(r => { %><%- include('partials/offer-card', { o: r }) %><% }) %></div></section>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

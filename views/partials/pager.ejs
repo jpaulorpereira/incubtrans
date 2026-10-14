@@ -1,0 +1,9 @@
+<% if (result.pages > 1) { %>
+<nav class="pager" aria-label="<%= t('lbl.pagina') %>">
+  <% if (result.page > 1) { %><a href="<%= qs({ pagina: result.page - 1 }) %>" rel="prev">‹ <%= t('lbl.anterior') %></a><% } else { %><span class="dis">‹ <%= t('lbl.anterior') %></span><% } %>
+  <% for (let i = 1; i <= result.pages; i++) { if (i === 1 || i === result.pages || Math.abs(i - result.page) <= 2) { %>
+    <% if (i === result.page) { %><span class="on" aria-current="page"><%= i %></span><% } else { %><a href="<%= qs({ pagina: i }) %>"><%= i %></a><% } %>
+  <% } else if (Math.abs(i - result.page) === 3) { %><span class="dis">…</span><% } } %>
+  <% if (result.page < result.pages) { %><a href="<%= qs({ pagina: result.page + 1 }) %>" rel="next"><%= t('lbl.seguinte') %> ›</a><% } else { %><span class="dis"><%= t('lbl.seguinte') %> ›</span><% } %>
+</nav>
+<% } %>

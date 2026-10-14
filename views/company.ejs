@@ -1,0 +1,46 @@
+<% const jsonld = { '@context': 'https://schema.org', '@type': 'LocalBusiness', name: e.name, description: pick(e, 'desc'), url: `${baseUrl}/empresas/${e.slug}`, ...(e.logo ? { logo: baseUrl + e.logo } : {}), ...(e.mainLoc ? { address: { '@type': 'PostalAddress', streetAddress: e.mainLoc.address || '', addressLocality: e.mainLoc.municipality, addressRegion: e.mainLoc.region, addressCountry: e.mainLoc.country === 'Espanha' ? 'ES' : 'PT' }, geo: { '@type': 'GeoCoordinates', latitude: e.mainLoc.plat, longitude: e.mainLoc.plng } } : {}), ...(rating.n ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: rating.avg, reviewCount: rating.n } } : {}) }; %>
+<%- include('partials/head', { band: { title: e.name, sub: catName(e), back: [t('nav.produtos'), '/produtos'] }, metaDesc: pick(e, 'desc'), jsonld, needMap: true }) %>
+<div class="wrap page">
+  <% if (e.cover) { %><div class="cover"><img src="<%= e.cover %>" alt=""></div><% } %>
+  <div class="detail">
+    <div>
+      <section class="card pad" style="position:relative">
+        <div class="row" style="flex-wrap:nowrap;gap:18px">
+          <div class="logo-box lg"><% if (e.logo) { %><img src="<%= e.logo %>" alt="<%= e.name %>"><% } else { %><span class="ini" style="font-size:36px"><%= U.initials(e.short_name || e.name) %></span><% } %></div>
+          <div>
+            <div class="row" style="gap:10px"><h1 style="font-size:26px"><%= e.name %></h1><% if (e.isVerified) { %><span class="verified" title="<%= t('lbl.verificadoEm') %> <%= U.formatDate(e.verified_at) %>"><%- icon('check', 12) %> <%= t('lbl.verificado') %> · <%= U.formatDate(e.verified_at) %></span><% } %></div>
+            <div class="meta">
+              <% if (catName(e)) { %><span><%= t('lbl.setor') %>: <a href="/produtos?categoria=<%= e.category_id %>"><%= catName(e) %></a></span><% } %>
+              <% if (e.locText) { %><span><%- icon('pin', 14) %> <%= e.locText %></span><% } %>
+              <% if (e.year) { %><span><%- icon('calendar', 14) %> <%= t('lbl.desde') %> <%= e.year %></span><% } %>
+              <% if (rating.n) { %><span><a href="#avaliacoes"><%- include('partials/stars', { n: rating.avg }) %> <%= String(rating.avg).replace('.', ',') %> (<%= rating.n %>)</a></span><% } %>
+            </div>
+          </div>
+        </div>
+        <% if (pick(e, 'desc')) { %><div style="color:var(--ink-2);font-size:15.5px;line-height:1.65;margin-top:20px;white-space:pre-line"><%= pick(e, 'desc') %></div><% } %>
+        <% if (isFallback(e, 'desc')) { %><p class="tiny muted" style="margin-top:8px"><%= t('lbl.original') %></p><% } %>
+      </section>
+      <section style="margin-top:26px">
+        <div class="sec-head" style="margin-bottom:18px"><h2><%= t('lbl.ofertaEmpresa') %> <span class="muted" style="font-size:16px">(<%= offers.length %>)</span></h2></div>
+        <% if (!offers.length) { %><div class="card empty"><%= t('area.nenhum') %></div><% } %>
+        <div class="grid2"><% offers.forEach(o => { %><%- include('partials/offer-card', { o }) %><% }) %></div>
+      </section>
+      <%- include('partials/reviews', { reviews, rating }) %>
+    </div>
+    <aside class="side">
+      <div class="card pad">
+        <h2 style="font-size:20px"><%= t('lbl.contactos') %></h2>
+        <div style="margin-top:14px"><%- include('partials/contacts', { e, offerId: null }) %></div>
+        <% if (e.locations.length) { %>
+          <hr class="divider">
+          <div class="label" style="margin-top:0"><%= t('lbl.localizacoes') %></div>
+          <% e.locations.forEach(l => { %><p class="small" style="margin-bottom:8px"><%- icon('pin', 14) %> <%= [l.address, l.municipality, country(l.country)].filter(Boolean).join(', ') %></p><% }) %>
+          <% if (consentMaps) { %><div class="mini-map" id="map" data-mode="entity" data-points='<%= JSON.stringify(e.locations.filter(l => l.plat).map(l => ({ lat: l.plat, lng: l.plng, name: e.name, place: [l.address, l.municipality].filter(Boolean).join(", "), type: e.type }))) %>'></div><% } else { %><p class="tiny muted"><a href="/mapa"><%= t('map.consentT') %> →</a></p><% } %>
+        <% } %>
+        <p style="margin-top:16px"><a class="tiny muted" href="/denunciar/entidade/<%= e.id %>?voltar=<%= encodeURIComponent(path) %>" rel="nofollow"><%- icon('flag', 13) %> <%= t('btn.denunciar') %></a></p>
+      </div>
+      <%- include('partials/review-form', { e, captcha }) %>
+    </aside>
+  </div>
+</div>
+<%- include('partials/foot', { needMap: true }) %>

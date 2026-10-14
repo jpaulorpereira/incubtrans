@@ -1,0 +1,32 @@
+<%- include('_head') %>
+<% const sum = (arr, f) => arr.filter(f).reduce((a, b) => a + b.n, 0); %>
+<div class="card row between" style="padding:12px 18px;margin-bottom:20px">
+  <b><%= tr('Estatísticas globais da plataforma', 'Estadísticas globales de la plataforma') %></b>
+  <div class="seg"><% [7, 30, 90, 365].forEach(d => { %><a href="?periodo=<%= d %>" class="<%= days === d ? 'on' : '' %>"><%= d %> <%= t('lbl.dias') %></a><% }) %></div>
+</div>
+<div class="grid4" style="margin-bottom:24px">
+  <div class="card kpi-card"><div class="top"><%= t('lbl.visualizacoes') %></div><div class="v"><%= U.formatNumber(totals.v) %></div></div>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.contactosN') %></div><div class="v"><%= U.formatNumber(totals.c) %></div></div>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.taxaContacto') %></div><div class="v"><%= U.formatPct(totals.v ? totals.c / totals.v : 0) %></div></div>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.avaliacoes') %></div><div class="v"><%= reviews.n %></div><div class="how"><%= reviews.a ? `${reviews.a.toFixed(1).replace('.', ',')} ★` : '' %></div></div>
+</div>
+<div class="grid2" style="align-items:start">
+  <section class="card pad"><h2 style="font-size:19px;margin-bottom:6px"><%= tr('Visualizações por dia', 'Visualizaciones por día') %></h2><%- include('../area/_chart', { series: byDay, label: 'views' }) %></section>
+  <section class="card pad">
+    <h2 style="font-size:19px;margin-bottom:12px"><%= tr('Entidades por tipo e estado', 'Entidades por tipo y estado') %></h2>
+    <div class="table-wrap"><table class="t"><thead><tr><th></th><% ['aprovada', 'pendente', 'suspensa', 'rejeitada'].forEach(s => { %><th><%= statusLabel(s) %></th><% }) %></tr></thead><tbody>
+      <% ['empresa', 'incubadora', 'agente'].forEach(r => { %><tr><td><b><%= t('lbl.' + r) %></b></td><% ['aprovada', 'pendente', 'suspensa', 'rejeitada'].forEach(s => { %><td><%= sum(byType, x => x.role === r && x.status === s) %></td><% }) %></tr><% }) %>
+    </tbody></table></div>
+    <p class="small" style="margin-top:12px"><b><%= tr('Ofertas', 'Ofertas') %>:</b> <%= sum(offers, x => x.kind === 'produto' && x.status === 'ativo') %> <%= tr('produtos e', 'productos y') %> <%= sum(offers, x => x.kind === 'servico' && x.status === 'ativo') %> <%= tr('serviços ativos', 'servicios activos') %> · <%= sum(offers, x => x.status === 'inativo') %> <%= tr('inativos', 'inactivos') %></p>
+    <p class="small"><b><%= tr('Por país', 'Por país') %>:</b> <%= byCountry.map(c => `${country(c.country)} ${c.n}`).join(' · ') %></p>
+  </section>
+  <section class="card pad"><h2 style="font-size:19px;margin-bottom:12px"><%= tr('Contactos por canal', 'Contactos por canal') %></h2>
+    <% const cm = Math.max(1, ...byChannel.map(c => c.n)); byChannel.forEach(c => { %><div class="hbar"><span><%= t('area.canais.' + c.channel) %></span><div class="track"><div class="fill" style="width:<%= c.n / cm * 100 %>%"></div></div><span class="n"><%= c.n %></span></div><% }) %>
+  </section>
+  <section class="card pad"><h2 style="font-size:19px;margin-bottom:12px"><%= tr('Entidades mais vistas', 'Entidades más vistas') %></h2>
+    <div class="table-wrap"><table class="t"><thead><tr><th><%= tr('Entidade', 'Entidad') %></th><th><%= t('lbl.visualizacoes') %></th><th><%= t('lbl.contactosN') %></th></tr></thead><tbody>
+      <% top.forEach(e => { %><tr><td><b><%= e.name %></b><div class="tiny muted"><%= t('lbl.' + e.type) %></div></td><td><%= e.v %></td><td><%= e.c %></td></tr><% }) %>
+    </tbody></table></div>
+  </section>
+</div>
+<%- include('_foot') %>

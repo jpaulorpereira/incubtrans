@@ -1,0 +1,31 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= t('admin.tabs.categorias') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Lista fechada de categorias e setores, em português e espanhol. As marcadas como destaque aparecem na página inicial.', 'Lista cerrada de categorías y sectores, en portugués y español. Las marcadas como destacadas aparecen en la página de inicio.') %></p>
+  <div class="table-wrap"><table class="t">
+    <thead><tr><th>PT</th><th>ES</th><th><%= tr('Ordem', 'Orden') %></th><th><%= tr('Ativa', 'Activa') %></th><th><%= t('lbl.destaque') %></th><th><%= tr('Ofertas', 'Ofertas') %></th><th class="actions"></th></tr></thead>
+    <tbody>
+      <% rows.forEach(c => { %>
+        <tr><td colspan="6" style="padding:8px 16px">
+          <form method="post" action="/gestao/categorias" class="row" style="flex-wrap:nowrap" id="cat<%= c.id %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= c.id %>">
+            <input class="input" name="name_pt" value="<%= c.name_pt %>" aria-label="PT"><input class="input" name="name_es" value="<%= c.name_es %>" aria-label="ES">
+            <input class="input" name="sort" type="number" value="<%= c.sort %>" style="width:80px" aria-label="<%= tr('Ordem', 'Orden') %>">
+            <label class="check"><input type="checkbox" name="active" value="1" <%= c.active ? 'checked' : '' %>><span class="sr"><%= tr('Ativa', 'Activa') %></span></label>
+            <label class="check"><input type="checkbox" name="featured" value="1" <%= c.featured ? 'checked' : '' %>><span class="sr"><%= t('lbl.destaque') %></span></label>
+            <span class="small muted" style="width:50px;text-align:center"><%= c.n %></span>
+            <button class="btn ghost sm"><%= t('btn.guardar') %></button>
+          </form></td>
+          <td class="actions"><% if (!c.n) { %><form method="post" action="/gestao/categorias/<%= c.id %>/eliminar" class="inline js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= t('btn.eliminar') %></button></form><% } %></td></tr>
+      <% }) %>
+    </tbody>
+  </table></div>
+  <form method="post" action="/gestao/categorias" class="row" style="margin-top:18px">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input class="input" name="name_pt" placeholder="<%= tr('Nova categoria (PT)', 'Nueva categoría (PT)') %>" required style="max-width:260px">
+    <input class="input" name="name_es" placeholder="ES" style="max-width:260px">
+    <input class="input" name="sort" type="number" placeholder="<%= tr('Ordem', 'Orden') %>" style="max-width:100px">
+    <label class="check"><input type="checkbox" name="featured" value="1"> <%= t('lbl.destaque') %></label>
+    <button class="btn"><%= t('btn.adicionar') %></button>
+  </form>
+</section>
+<%- include('_foot') %>

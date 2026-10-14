@@ -1,0 +1,69 @@
+<%- include('_head') %>
+<p style="margin-bottom:16px"><a href="/gestao/contas">‹ <%= t('admin.tabs.contas') %></a></p>
+<div class="detail">
+  <div class="stack">
+    <section class="card pad">
+      <div class="row between"><h2><%= u.entity_name %></h2><span class="pill <%= u.status %>"><%= statusLabel(u.status) %></span></div>
+      <p class="muted small" style="margin-top:6px"><%= t('lbl.' + u.role) %> · <%= tr('registo', 'registro') %> <%= U.formatDate(u.created_at) %> · <%= u.email_verified ? tr('email confirmado', 'email confirmado') : tr('email por confirmar', 'email sin confirmar') %><%= u.last_login ? ` · ${tr('último acesso', 'último acceso')} ${U.formatDate(u.last_login)}` : '' %></p>
+      <% if (u.status_reason) { %><div class="alert warn" style="margin-top:12px"><%= t('auth.motivo') %>: <%= u.status_reason %></div><% } %>
+      <% if (e) { %>
+        <div class="alert info" style="margin-top:14px">
+          <b><%= tr('Validação institucional', 'Validación institucional') %>:</b>
+          <%= tr('confirme a existência legal (NIF/CIF — consultável no VIES quando aplicável), a sede ou atividade na Eurorregião e os contactos.', 'confirma la existencia legal (NIF/CIF — consultable en VIES cuando proceda), la sede o actividad en la Eurorregión y los contactos.') %>
+          <div class="small" style="margin-top:6px">NIF/CIF: <b><%= e.nif || '—' %></b> · <%= tr('Localizações', 'Ubicaciones') %>: <%= e.locations.map(l => [l.address, l.municipality, l.country].filter(Boolean).join(', ')).join(' | ') || '—' %></div>
+          <div class="small">Email: <%= e.email || '—' %> · <%= tr('Telefone', 'Teléfono') %>: <%= e.phone || '—' %> · Website: <%= e.website || '—' %></div>
+          <% if (e.type === 'empresa') { %><div class="small" style="margin-top:6px"><%= tr('Selo', 'Sello') %>: <%= e.isVerified ? `${t('lbl.verificado')} (${U.formatDate(e.verified_at)})` : (e.needs_revalidation ? tr('a rever (dados alterados)', 'a revisar (datos cambiados)') : (e.verified ? tr('expirado (mais de 1 ano)', 'caducado (más de 1 año)') : tr('sem selo', 'sin sello'))) %></div><% } %>
+        </div>
+        <% if (u.status === 'aprovada' || u.status === 'pendente') { %><p class="small" style="margin-top:10px"><a href="/<%= { empresa: 'empresas', incubadora: 'incubadoras', agente: 'agentes' }[e.type] %>/<%= e.slug %>" target="_blank"><%= tr('Ver página pública', 'Ver página pública') %> <%- icon('ext', 12) %></a> <%= u.status === 'pendente' ? tr('(ainda não pública)', '(aún no pública)') : '' %></p><% } %>
+      <% } %>
+    </section>
+    <form class="card pad" method="post" action="/gestao/contas/<%= u.id %>">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2 style="font-size:19px;margin-bottom:16px"><%= tr('Editar dados', 'Editar datos') %></h2>
+      <div class="fields2">
+        <div class="field"><label class="l" for="ad-n"><%= tr('Nome do responsável', 'Nombre del responsable') %></label><input class="input" id="ad-n" name="name" value="<%= u.name %>"></div>
+        <div class="field"><label class="l" for="ad-e"><%= tr('Email de acesso', 'Email de acceso') %></label><input class="input" id="ad-e" name="email" value="<%= u.email %>"></div>
+        <% if (e) { %>
+        <div class="field"><label class="l" for="ad-en"><%= tr('Nome da entidade', 'Nombre de la entidad') %></label><input class="input" id="ad-en" name="entity_name" value="<%= e.name %>"></div>
+        <div class="field"><label class="l" for="ad-nif">NIF / CIF</label><input class="input" id="ad-nif" name="nif" value="<%= e.nif || '' %>"></div>
+        <div class="field"><label class="l" for="ad-ph"><%= tr('Telefone público', 'Teléfono público') %></label><input class="input" id="ad-ph" name="phone" value="<%= e.phone || '' %>"></div>
+        <div class="field"><label class="l" for="ad-ee"><%= tr('Email público', 'Email público') %></label><input class="input" id="ad-ee" name="entity_email" value="<%= e.email || '' %>"></div>
+        <div class="field"><label class="l" for="ad-w">Website</label><input class="input" id="ad-w" name="website" value="<%= e.website || '' %>"></div>
+        <div class="field"><label class="l" for="ad-c"><%= t('lbl.setor') %></label><select class="input" id="ad-c" name="category_id"><option value="">—</option><% cats.forEach(c => { %><option value="<%= c.id %>" <%= e.category_id === c.id ? 'selected' : '' %>><%= lang === 'es' ? c.name_es : c.name_pt %></option><% }) %></select></div>
+        <% } %>
+      </div>
+      <button class="btn"><%= t('btn.guardarAlt') %></button>
+    </form>
+    <% if (history.length) { %>
+    <section class="card pad"><h2 style="font-size:19px;margin-bottom:10px"><%= t('admin.tabs.auditoria') %></h2>
+      <% history.forEach(h => { %><div class="item-row small"><b><%= h.action %></b> · <%= U.formatDate(h.created_at) %> · <%= h.user_email || '' %><%= h.details ? ' — ' + h.details : '' %></div><% }) %>
+    </section>
+    <% } %>
+  </div>
+  <aside class="side stack">
+    <% const post = (acao, label, cls, extra) => `<form method="post" action="/gestao/contas/${u.id}/${acao}" class="stack"><input type="hidden" name="_csrf" value="${csrf}">${extra || ''}<button class="btn ${cls} block">${label}</button></form>`; %>
+    <section class="card pad">
+      <h2 style="font-size:18px;margin-bottom:14px"><%= tr('Decisão', 'Decisión') %></h2>
+      <% if (u.status === 'pendente') { %>
+        <%- post('aprovar', tr('Aprovar conta', 'Aprobar cuenta'), 'ok', u.role === 'empresa' ? `<label class="check"><input type="checkbox" name="verify" value="1" checked> ${tr('Atribuir já o selo "Verificado"', 'Asignar ya el sello "Verificado"')}</label>` : '') %>
+        <hr class="divider">
+        <div id="rejeitar"><%- post('rejeitar', tr('Rejeitar registo', 'Rechazar registro'), 'danger', `<label class="l" for="rj">${t('auth.motivo')} *</label><textarea class="input" id="rj" name="reason" required style="min-height:70px"></textarea>`) %></div>
+      <% } else if (u.status === 'aprovada') { %>
+        <% if (u.role === 'empresa') { %>
+          <% if (!e.isVerified) { %><%- post('verificar', tr('Validar e atribuir selo', 'Validar y asignar sello'), 'ok') %><% } else { %><%- post('verificar', tr('Revalidar selo (renova data)', 'Revalidar sello (renueva fecha)'), 'ghost') %><% } %>
+          <% if (e.verified) { %><div style="margin-top:12px"><%- post('retirar-selo', tr('Retirar selo', 'Retirar sello'), 'danger', `<label class="l" for="rs">${t('auth.motivo')}</label><input class="input" id="rs" name="reason">`) %></div><% } %>
+          <hr class="divider">
+        <% } %>
+        <div id="suspender"><%- post('suspender', tr('Suspender conta', 'Suspender cuenta'), 'danger', `<label class="l" for="sp">${t('auth.motivo')}</label><textarea class="input" id="sp" name="reason" style="min-height:70px"></textarea>`) %></div>
+      <% } else { %>
+        <%- post('reativar', tr('Reativar / aprovar conta', 'Reactivar / aprobar cuenta'), 'ok') %>
+      <% } %>
+    </section>
+    <section class="card pad" style="border-color:#F1C9C4">
+      <h2 style="font-size:18px;color:var(--bad);margin-bottom:8px"><%= tr('Remover conta', 'Eliminar cuenta') %></h2>
+      <p class="small muted" style="margin-bottom:12px"><%= tr('Remove a conta, o perfil e todos os conteúdos. Não pode ser anulado.', 'Elimina la cuenta, el perfil y todos los contenidos. No se puede deshacer.') %></p>
+      <%- post('remover', tr('Remover definitivamente', 'Eliminar definitivamente'), 'danger', `<label class="check"><input type="checkbox" name="confirm" value="sim" required> ${tr('Confirmo a remoção', 'Confirmo la eliminación')}</label><input class="input" name="reason" placeholder="${t('auth.motivo')}">`) %>
+    </section>
+  </aside>
+</div>
+<%- include('_foot') %>

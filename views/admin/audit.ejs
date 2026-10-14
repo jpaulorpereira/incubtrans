@@ -1,0 +1,9 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= t('admin.tabs.auditoria') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Registo das ações administrativas (aprovações, remoções, alterações de estado).', 'Registro de las acciones administrativas (aprobaciones, eliminaciones, cambios de estado).') %></p>
+  <div class="table-wrap"><table class="t"><thead><tr><th><%= t('area.data') %></th><th><%= tr('Utilizador', 'Usuario') %></th><th><%= tr('Ação', 'Acción') %></th><th><%= tr('Alvo', 'Objeto') %></th><th><%= t('report.detalhes') %></th></tr></thead><tbody>
+    <% rows.forEach(a => { %><tr><td class="small" style="white-space:nowrap"><%= U.formatDate(a.created_at) %> <%= String(a.created_at).slice(11, 16) %></td><td class="small"><%= a.user_email || '—' %></td><td><code class="small"><%= a.action %></code></td><td><%= a.target || '' %></td><td class="small muted"><%= a.details || '' %></td></tr><% }) %>
+  </tbody></table></div>
+</section>
+<%- include('_foot') %>

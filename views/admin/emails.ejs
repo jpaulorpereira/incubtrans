@@ -1,0 +1,17 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= t('admin.tabs.emails') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Modelos dos emails enviados automaticamente. Variáveis disponíveis entre chavetas, por exemplo {name}, {entity}, {link}, {reason}, {base_url}.', 'Plantillas de los emails enviados automáticamente. Variables disponibles entre llaves, por ejemplo {name}, {entity}, {link}, {reason}, {base_url}.') %></p>
+  <% rows.forEach(r => { %>
+    <details class="box" <%= edit === r.key ? 'open' : '' %>><summary><code class="small"><%= r.key %></code> <span class="muted small"><%= r.description %></span></summary><div class="in">
+      <form method="post" action="/gestao/emails/<%= r.key %>"><input type="hidden" name="_csrf" value="<%= csrf %>">
+        <div class="fields2">
+          <div><div class="field"><label class="l"><%= tr('Assunto', 'Asunto') %> (PT)</label><input class="input" name="subject_pt" value="<%= r.subject_pt %>"></div><div class="field"><label class="l"><%= tr('Texto', 'Texto') %> (PT)</label><textarea class="input" name="body_pt" style="min-height:170px"><%= r.body_pt %></textarea></div></div>
+          <div><div class="field"><label class="l"><%= tr('Assunto', 'Asunto') %> (ES)</label><input class="input" name="subject_es" value="<%= r.subject_es %>"></div><div class="field"><label class="l"><%= tr('Texto', 'Texto') %> (ES)</label><textarea class="input" name="body_es" style="min-height:170px"><%= r.body_es %></textarea></div></div>
+        </div>
+        <button class="btn sm"><%= t('btn.guardar') %></button>
+      </form>
+    </div></details>
+  <% }) %>
+</section>
+<%- include('_foot') %>

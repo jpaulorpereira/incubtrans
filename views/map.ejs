@@ -1,0 +1,30 @@
+<%- include('partials/head', { band: { title: t('map.title'), sub: t('map.sub') }, needMap: true }) %>
+<div class="wrap page">
+  <div class="map-layout">
+    <div class="card filters" style="position:static">
+      <h2><%= t('btn.filtrar') %></h2>
+      <fieldset style="border:none;padding:0;margin:0 0 14px"><legend class="l"><%= t('map.tipos') %></legend>
+        <label class="check"><input type="checkbox" class="js-mf" name="type" value="empresa" checked> <span class="dot" style="background:#0A6FB0"></span><%= t('lbl.empresa') %></label>
+        <label class="check" style="margin-top:6px"><input type="checkbox" class="js-mf" name="type" value="incubadora" checked> <span class="dot" style="background:#1F9D55"></span><%= t('lbl.incubadora') %></label>
+        <label class="check" style="margin-top:6px"><input type="checkbox" class="js-mf" name="type" value="agente" checked> <span class="dot" style="background:#F5A524"></span><%= t('lbl.agente') %></label>
+      </fieldset>
+      <div class="f"><label class="l" for="m-c"><%= t('lbl.categoria') %></label><select class="input js-mf" id="m-c" name="category"><option value=""><%= t('lbl.todos') %></option><% cats.forEach(c => { %><option value="<%= c.id %>"><%= lang === 'es' ? c.name_es : c.name_pt %></option><% }) %></select></div>
+      <div class="f"><label class="l" for="m-r"><%= t('lbl.localizacao') %></label><select class="input js-mf" id="m-r" name="region"><option value=""><%= t('lbl.todos') %></option><% regions.forEach(r => { %><option value="<%= r.region %>"><%= r.region %> (<%= country(r.country) %>)</option><% }) %></select></div>
+      <p class="small muted" id="map-count" role="status"></p>
+      <div class="map-list" id="map-list" aria-label="<%= t('map.lista') %>"></div>
+    </div>
+    <div>
+      <% if (consentMaps) { %>
+        <div id="map" data-mode="full"></div>
+      <% } else { %>
+        <div class="card map-consent" style="height:640px">
+          <span style="color:var(--blue)"><%- icon('map', 40) %></span>
+          <b style="font-size:18px"><%= t('map.consentT') %></b><p class="muted" style="max-width:52ch"><%= t('map.consentS') %></p>
+          <form method="post" action="/cookies"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="back" value="/mapa"><button class="btn" name="maps" value="1"><%= t('btn.ativarMapa') %></button></form>
+        </div>
+        <div id="map-nomap" hidden></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot', { needMap: true }) %>

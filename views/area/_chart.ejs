@@ -1,0 +1,6 @@
+<%# Gráfico de barras simples (visualizações por dia), sem bibliotecas externas %>
+<% const max = Math.max(1, ...series.map(s => s.v || 0)); %>
+<div class="bars" role="img" aria-label="<%= label %>">
+  <% series.forEach(s => { %><div style="height:<%= Math.max(1, Math.round((s.v || 0) / max * 100)) %>%" title="<%= U.formatDate(s.d) %>: <%= s.v || 0 %> / <%= s.c || 0 %>"></div><% }) %>
+</div>
+<div class="bars-legend"><span><%= series[0] ? U.formatDate(series[0].d) : '' %></span><span><%= series.length ? U.formatDate(series[series.length - 1].d) : '' %></span></div>

@@ -1,0 +1,17 @@
+<section class="card pad" id="avaliacoes" style="margin-top:22px">
+  <div class="row between">
+    <h2 style="font-size:20px"><%= t('lbl.avaliacoes') %></h2>
+    <% if (rating.n) { %><div class="row" style="gap:8px"><%- include('stars', { n: rating.avg }) %><b><%= String(rating.avg).replace('.', ',') %></b><span class="muted small">(<%= rating.n %> <%= rating.n === 1 ? t('lbl.avaliacao') : t('lbl.avaliacoes').toLowerCase() %>)</span></div><% } %>
+  </div>
+  <% if (!reviews.length) { %><p class="muted" style="margin-top:12px"><%= t('lbl.semAvaliacoes') %></p><% } %>
+  <div style="margin-top:8px">
+  <% reviews.forEach(r => { %>
+    <div class="review">
+      <div class="row between"><div class="row" style="gap:10px"><%- include('stars', { n: r.rating }) %><b><%= r.author_name || t('review.anonimo') %></b></div><span class="muted tiny"><%= U.formatDate(r.created_at) %></span></div>
+      <% if (r.comment) { %><p style="margin-top:8px;color:var(--ink-2)"><%= r.comment %></p><% } %>
+      <% if (r.reply) { %><div class="reply"><b><%= t('lbl.respostaEmpresa') %>:</b> <%= r.reply %></div><% } %>
+      <a class="tiny muted" href="/denunciar/avaliacao/<%= r.id %>?voltar=<%= encodeURIComponent(path) %>" rel="nofollow"><%= t('btn.denunciar') %></a>
+    </div>
+  <% }) %>
+  </div>
+</section>

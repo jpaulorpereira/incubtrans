@@ -1,0 +1,24 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= tr('Pedidos de destaque', 'Solicitudes de destacado') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr(`Cada destaque dura ${days} dias e cada empresa pode ter um ativo ou pendente.`, `Cada destacado dura ${days} días y cada empresa puede tener uno activo o pendiente.`) %></p>
+  <div class="table-wrap"><table class="t">
+    <thead><tr><th><%= tr('Produto/serviço', 'Producto/servicio') %></th><th><%= t('lbl.empresa') %></th><th><%= tr('Pedido', 'Solicitud') %></th><th><%= tr('Estado', 'Estado') %></th><th class="actions"></th></tr></thead>
+    <tbody>
+      <% if (!reqs.length) { %><tr><td colspan="5" class="muted"><%= t('lbl.semDados') %></td></tr><% } %>
+      <% reqs.forEach(h => { const live = h.status === 'aprovado' && h.featured_until && h.featured_until > new Date().toISOString().slice(0, 19).replace('T', ' '); %>
+        <tr><td><a href="/produtos/<%= h.slug %>" target="_blank"><b><%= pick(h, 'title') %></b></a></td><td><%= h.company %></td><td class="small"><%= U.formatDate(h.created_at) %></td>
+          <td><span class="pill <%= h.status %>"><%= h.status %></span><% if (live) { %><div class="tiny muted"><%= tr('até', 'hasta') %> <%= U.formatDate(h.featured_until) %></div><% } %><% if (h.reason) { %><div class="tiny muted"><%= h.reason %></div><% } %></td>
+          <td class="actions">
+            <% if (h.status === 'pendente') { %>
+              <form method="post" action="/gestao/destaques/<%= h.id %>/aprovar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn ok sm"><%= tr('Aprovar', 'Aprobar') %></button></form>
+              <form method="post" action="/gestao/destaques/<%= h.id %>/rejeitar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><input class="input" name="reason" placeholder="<%= t('auth.motivo') %>" style="width:160px;padding:7px 10px;display:inline-block"><button class="btn danger sm"><%= tr('Rejeitar', 'Rechazar') %></button></form>
+            <% } else if (live) { %>
+              <form method="post" action="/gestao/destaques/<%= h.id %>/terminar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn ghost sm"><%= tr('Terminar destaque', 'Terminar destacado') %></button></form>
+            <% } %>
+          </td></tr>
+      <% }) %>
+    </tbody>
+  </table></div>
+</section>
+<%- include('_foot') %>

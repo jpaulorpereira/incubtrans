@@ -1,0 +1,15 @@
+<%- include('partials/head', { band: { title: t('report.title'), back: [t('btn.voltar'), back.startsWith('/') ? back : '/'] } }) %>
+<div class="wrap page" style="max-width:720px">
+  <form class="card" style="padding:36px" method="post" action="/denunciar/<%= type %>/<%= id %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="back" value="<%= back %>">
+    <h2><%= t('report.title') %></h2>
+    <p class="muted" style="margin:8px 0 22px"><%= t('report.sub') %></p>
+    <fieldset style="border:none;padding:0;margin:0 0 18px"><legend class="l"><%= t('report.motivo') %></legend>
+      <% Object.entries(t('report.motivos')).forEach(([k, v], i) => { %><label class="check" style="margin-bottom:8px"><input type="radio" name="reason" value="<%= k %>" <%= i === 0 ? 'checked' : '' %>> <%= v %></label><% }) %>
+    </fieldset>
+    <div class="field"><label class="l" for="rp-d"><%= t('report.detalhes') %></label><textarea class="input" id="rp-d" name="details" maxlength="1500"></textarea></div>
+    <%- include('partials/captcha', { form: 'report', captcha }) %>
+    <button class="btn"><%= t('btn.denunciar') %></button>
+  </form>
+</div>
+<%- include('partials/foot') %>

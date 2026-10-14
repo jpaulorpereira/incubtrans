@@ -1,0 +1,29 @@
+<%- include('_head') %>
+<%- include('_period', { periods: [7, 30, 90, 365] }) %>
+<%- include('_kpis') %>
+<div class="grid2" style="align-items:start">
+  <section class="card pad"><h2 style="font-size:19px;margin-bottom:6px"><%= t('area.porDia') %></h2><%- include('_chart', { series: stats.byDay, label: t('area.porDia') }) %>
+    <p class="tiny muted" style="margin-top:10px"><%= t('area.perfilPub') %>: <%= U.formatNumber(stats.profile.v || 0) %> <%= t('lbl.visualizacoes').toLowerCase() %> · <%= U.formatNumber(stats.profile.c || 0) %> <%= t('lbl.contactosN').toLowerCase() %></p>
+  </section>
+  <section class="card pad"><h2 style="font-size:19px;margin-bottom:12px"><%= t('area.porCanal') %></h2>
+    <% const cmax = Math.max(1, ...stats.byChannel.map(c => c.n)); %>
+    <% if (!stats.byChannel.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+    <% stats.byChannel.forEach(c => { %><div class="hbar"><span><%= t('area.canais.' + c.channel) %></span><div class="track"><div class="fill" style="width:<%= c.n / cmax * 100 %>%"></div></div><span class="n"><%= c.n %></span></div><% }) %>
+  </section>
+</div>
+<% if (role === 'empresa') { %>
+<section class="card pad" style="margin-top:24px">
+  <h2 style="font-size:19px;margin-bottom:14px"><%= t('area.porProduto') %></h2>
+  <div class="table-wrap"><table class="t"><thead><tr><th><%= t('area.titulo_') %></th><th><%= t('area.tipo') %></th><th><%= t('area.estado') %></th><th><%= t('lbl.visualizacoes') %></th><th><%= t('lbl.contactosN') %></th><th><%= t('lbl.taxaContacto') %></th></tr></thead><tbody>
+    <% stats.byOffer.forEach(o => { %><tr><td><b><%= pick(o, 'title') %></b></td><td><%= kindLabel(o.kind) %></td><td><span class="pill <%= o.status %>"><%= statusLabel(o.status) %></span></td><td><%= o.v || 0 %></td><td><%= o.c || 0 %></td><td><%= U.formatPct(o.v ? (o.c || 0) / o.v : 0) %></td></tr><% }) %>
+  </tbody></table></div>
+</section>
+<section class="card pad" style="margin-top:24px">
+  <h2 style="font-size:19px;margin-bottom:12px"><%= t('area.porCategoria') %></h2>
+  <% if (!stats.byCategory.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+  <% const vmax = Math.max(1, ...stats.byCategory.map(c => c.v || 0)); stats.byCategory.forEach(c => { %>
+    <div class="hbar"><span><%= lang === 'es' ? c.name_es : c.name_pt %></span><div class="track"><div class="fill" style="width:<%= (c.v || 0) / vmax * 100 %>%"></div></div><span class="n" title="<%= t('lbl.contactosN') %>: <%= c.c || 0 %>"><%= c.v || 0 %></span></div>
+  <% }) %>
+</section>
+<% } %>
+<%- include('_foot') %>

@@ -1,0 +1,20 @@
+<%# Contactos diretos de uma entidade; os cliques passam por /contacto/ para contar estatísticas sem dados pessoais %>
+<% const oq = typeof offerId !== 'undefined' && offerId ? `?o=${offerId}` : ''; const [mu, md] = String(e.email || '').split('@'); %>
+<ul class="contact-list">
+  <% if (e.phone) { %><li><span class="ic"><%- icon('phone', 18) %></span><a href="/contacto/<%= e.id %>/telefone<%= oq %>" rel="nofollow"><%= e.phone %></a></li><% } %>
+  <% if (e.email) { %><li><span class="ic"><%- icon('mail', 18) %></span><a href="/contacto/<%= e.id %>/email<%= oq %>" rel="nofollow" class="js-mail" data-u="<%= mu %>" data-d="<%= md %>"><%= mu %> [at] <%= md %></a></li><% } %>
+  <% if (e.website) { %><li><span class="ic"><%- icon('globe', 18) %></span><a href="/contacto/<%= e.id %>/website<%= oq %>" rel="nofollow noopener" target="_blank"><%= U.displayUrl(e.website) %></a></li><% } %>
+  <% if (e.contact_person && e.contact_person_public) { %><li><span class="ic"><%- icon('users', 18) %></span><%= t('lbl.pessoaContacto') %>: <%= e.contact_person %></li><% } %>
+</ul>
+<% if (e.socials.length) { %>
+  <div class="label"><%= t('lbl.redes') %></div>
+  <div class="socials">
+    <% e.socials.forEach((s, i) => { const st = SOCIAL[s.net] || ['#0B2C5C', '•']; %>
+      <a class="social" href="/contacto/<%= e.id %>/redes/<%= i %><%= oq %>" rel="nofollow noopener" target="_blank"><i style="background:<%= st[0] %>"><%= st[1] %></i><%= s.net %></a>
+    <% }) %>
+  </div>
+<% } %>
+<div class="row" style="margin-top:22px">
+  <% if (e.phone) { %><a class="btn" style="flex:1" href="/contacto/<%= e.id %>/telefone<%= oq %>" rel="nofollow"><%- icon('phone', 17) %> <%= t('btn.telefonar') %></a><% } %>
+  <% if (e.email) { %><a class="btn light" style="flex:1" href="/contacto/<%= e.id %>/email<%= oq %>" rel="nofollow"><%- icon('mail', 17) %> <%= t('btn.email') %></a><% } %>
+</div>

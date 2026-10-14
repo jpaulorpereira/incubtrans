@@ -1,0 +1,11 @@
+<%- include('../partials/head', { band: { title: t('area.titulo.' + role), sub: entity.name } }) %>
+<div class="wrap page">
+  <% if (pending) { %><div class="alert warn"><b><%= t('area.pendenteT') %>.</b> <%= t('area.pendenteS') %></div><% } %>
+  <% if (role === 'empresa' && entity.needs_revalidation) { %><div class="alert info"><b><%= t('area.revalidarT') %>.</b> <%= t('area.revalidarS') %></div><% } %>
+  <nav class="tabs" aria-label="<%= t('nav.area') %>">
+    <% tabs.forEach(k => { %><a href="/area<%= k === 'dash' ? '' : '/' + ({ stats: 'estatisticas', conta: 'conta' }[k] || k) %>" class="<%= tab === k ? 'on' : '' %>"><%= t('area.tabs.' + k) %></a><% }) %>
+    <span class="right row" style="gap:8px">
+      <% if (!pending) { %><a class="btn ghost sm" href="<%= publicUrl %>" target="_blank"><%= t('area.verPublica') %> <%- icon('ext', 13) %></a><% } %>
+      <% if (role === 'empresa') { %><a class="btn sm" href="/area/ofertas/nova"><%- icon('plus', 15) %> <%= t('area.novaOferta') %></a><% } %>
+    </span>
+  </nav>

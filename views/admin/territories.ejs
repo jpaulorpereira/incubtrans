@@ -1,0 +1,27 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= t('admin.tabs.territorios') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Taxonomia comum aos dois países: país, distrito ou província, concelho ou concello, com coordenadas para o mapa.', 'Taxonomía común a los dos países: país, distrito o provincia, concelho o concello, con coordenadas para el mapa.') %></p>
+  <form method="post" action="/gestao/territorios" class="row" style="margin-bottom:18px">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <select class="input" name="country" style="max-width:150px"><option>Portugal</option><option>Espanha</option></select>
+    <input class="input" name="region" placeholder="<%= tr('Distrito / província', 'Distrito / provincia') %>" required style="max-width:200px">
+    <input class="input" name="municipality" placeholder="<%= tr('Concelho / concello', 'Concelho / concello') %>" required style="max-width:200px">
+    <input class="input" name="lat" placeholder="Lat" style="max-width:110px"><input class="input" name="lng" placeholder="Lng" style="max-width:110px">
+    <button class="btn"><%= t('btn.adicionar') %></button>
+  </form>
+  <div class="table-wrap"><table class="t">
+    <thead><tr><th><%= t('lbl.pais') %></th><th><%= tr('Distrito / província', 'Distrito / provincia') %></th><th><%= tr('Concelho / concello', 'Concelho / concello') %></th><th>Lat, Lng</th><th><%= tr('Em uso', 'En uso') %></th><th class="actions"></th></tr></thead>
+    <tbody>
+      <% rows.forEach(r => { %>
+        <tr><td colspan="5" style="padding:8px 16px"><form method="post" action="/gestao/territorios" class="row" style="flex-wrap:nowrap"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= r.id %>">
+          <select class="input" name="country" style="max-width:130px"><option <%= r.country === 'Portugal' ? 'selected' : '' %>>Portugal</option><option <%= r.country === 'Espanha' ? 'selected' : '' %>>Espanha</option></select>
+          <input class="input" name="region" value="<%= r.region %>"><input class="input" name="municipality" value="<%= r.municipality %>">
+          <input class="input" name="lat" value="<%= r.lat ?? '' %>" style="max-width:100px"><input class="input" name="lng" value="<%= r.lng ?? '' %>" style="max-width:100px">
+          <span class="small muted" style="width:40px;text-align:center"><%= r.n %></span><button class="btn ghost sm"><%= t('btn.guardar') %></button></form></td>
+          <td class="actions"><% if (!r.n) { %><form method="post" action="/gestao/territorios/<%= r.id %>/eliminar" class="inline js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= t('btn.eliminar') %></button></form><% } %></td></tr>
+      <% }) %>
+    </tbody>
+  </table></div>
+</section>
+<%- include('_foot') %>

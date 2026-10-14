@@ -1,0 +1,35 @@
+<%- include('_head') %>
+<%- include('_period', { periods: [7, 30, 90] }) %>
+<% if (role === 'empresa') { %>
+  <%- include('_kpis', { first: { label: t('area.totalOfertas'), icon: 'store', value: activeOffers, how: lang === 'es' ? 'Publicados en el escaparate' : 'Publicados na montra' } }) %>
+<% } else { %>
+  <%- include('_kpis', { first: { label: role === 'incubadora' ? t('lbl.programasAtivos') : t('lbl.projetosAtivos'), icon: 'briefcase', value: (role === 'incubadora' ? programs : projects).filter(p => p.status === 'ativo').length, how: role === 'incubadora' ? `${incubatedCount} ${t('lbl.incubadas').toLowerCase()}` : `${projects.length} ${t('lbl.projetos').toLowerCase()}` } }) %>
+<% } %>
+<div class="grid2" style="align-items:start">
+  <section class="card pad">
+    <h2 style="font-size:19px;margin-bottom:6px"><%= t('area.porDia') %></h2>
+    <%- include('_chart', { series: stats.byDay, label: t('area.porDia') }) %>
+  </section>
+  <section class="card pad">
+    <% if (role === 'empresa') { %>
+      <div class="row between"><h2 style="font-size:19px"><%= t('area.recentes') %></h2><a href="/area/ofertas" class="small"><%= t('btn.verTodos') %> →</a></div>
+      <% if (!recent.length) { %><p class="muted" style="margin-top:12px"><%= t('area.nenhum') %></p><% } %>
+      <% recent.forEach(o => { %>
+        <div class="item-row row" style="flex-wrap:nowrap;margin-top:12px">
+          <div class="avatar" style="border-radius:12px;width:46px;height:46px"><%= U.initials(pick(o, 'title')) %></div>
+          <div style="min-width:0;flex:1"><b><%= pick(o, 'title') %></b><div class="tiny muted"><%= kindLabel(o.kind) %> · <%= priceLabel(o) %></div></div>
+          <span class="pill <%= o.status %>"><%= statusLabel(o.status) %></span>
+          <a class="btn ghost sm" href="/area/ofertas/<%= o.id %>"><%= t('btn.editar') %></a>
+        </div>
+      <% }) %>
+      <hr class="divider">
+      <div class="row between"><span><b><%= t('area.mediaAval') %>:</b> <%= rating.n ? `${String(rating.avg).replace('.', ',')} ★ (${rating.n})` : '—' %></span><a class="small" href="/area/avaliacoes"><%= t('area.tabs.avaliacoes') %> →</a></div>
+      <% if (pendingReviews) { %><p class="tiny muted" style="margin-top:6px"><%= pendingReviews %> <%= lang === 'es' ? 'sin respuesta' : 'sem resposta' %></p><% } %>
+    <% } else { %>
+      <div class="row between"><h2 style="font-size:19px"><%= t('lbl.eventos') %></h2><a href="/area/posts" class="small"><%= t('btn.adicionar') %> →</a></div>
+      <% if (!posts.length) { %><p class="muted" style="margin-top:12px"><%= t('area.nenhum') %></p><% } %>
+      <% posts.forEach(p => { %><div class="item-row" style="margin-top:10px"><span class="pill <%= p.kind === 'evento' ? 'violet' : 'blue' %>"><%= p.kind === 'evento' ? t('lbl.evento') : t('lbl.noticia') %></span> <b><%= p.title %></b> <span class="muted tiny"><%= U.formatDate(p.date) %></span></div><% }) %>
+    <% } %>
+  </section>
+</div>
+<%- include('_foot') %>

@@ -1,0 +1,48 @@
+<%- include('partials/head', { band: { title: t('contact.band'), sub: t('contact.bandSub') } }) %>
+<div class="wrap page">
+  <div class="detail">
+    <div class="stack">
+      <div class="card" style="padding:34px">
+        <% if (sent) { %>
+          <div style="text-align:center;padding:30px 0"><span style="color:var(--ok)"><%- icon('check', 40) %></span><h2 style="margin-top:12px"><%= t('contact.okT') %></h2><p class="muted" style="margin-top:8px"><%= t('contact.okS') %></p><a class="btn ghost" style="margin-top:20px" href="/contactos"><%= t('btn.voltar') %></a></div>
+        <% } else { %>
+        <form method="post" action="/contactos">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <h2><%= t('contact.title') %></h2>
+          <p class="muted" style="margin:8px 0 22px"><%= t('contact.sub') %></p>
+          <% if (err) { %><div class="alert error" role="alert"><%= err %></div><% } %>
+          <div class="fields2">
+            <div class="field"><label class="l" for="c-n"><%= t('contact.nome') %></label><input class="input" id="c-n" name="name" value="<%= form.name || '' %>" required autocomplete="name"></div>
+            <div class="field"><label class="l" for="c-e"><%= t('contact.email') %></label><input class="input" id="c-e" name="email" type="email" value="<%= form.email || '' %>" required autocomplete="email"></div>
+            <div class="field"><label class="l" for="c-o"><%= t('contact.entidade') %></label><input class="input" id="c-o" name="organization" value="<%= form.organization || '' %>" autocomplete="organization"></div>
+            <div class="field"><label class="l" for="c-s"><%= t('contact.assunto') %></label><select class="input" id="c-s" name="subject"><% t('contact.assuntos').forEach(a => { %><option <%= form.subject === a ? 'selected' : '' %>><%= a %></option><% }) %></select></div>
+          </div>
+          <div class="field"><label class="l" for="c-m"><%= t('contact.mensagem') %></label><textarea class="input" id="c-m" name="message" required style="min-height:150px"><%= form.message || '' %></textarea></div>
+          <%- include('partials/captcha', { form: 'contact', captcha }) %>
+          <label class="check" style="margin-bottom:20px"><input type="checkbox" name="rgpd" value="1" required> <%= t('contact.rgpd') %></label>
+          <button class="btn"><%= t('btn.enviar') %></button>
+        </form>
+        <% } %>
+      </div>
+      <section class="card pad" id="faq">
+        <h2 style="margin-bottom:14px"><%= t('contact.faq') %></h2>
+        <% faqs.forEach(f => { %><details class="box"><summary><%= lang === 'es' ? f.q_es || f.q_pt : f.q_pt %></summary><div class="in"><p style="color:var(--ink-2)"><%= lang === 'es' ? f.a_es || f.a_pt : f.a_pt %></p></div></details><% }) %>
+      </section>
+    </div>
+    <aside class="side card pad">
+      <h2 style="font-size:20px"><%= t('contact.secretariado') %></h2>
+      <ul class="contact-list" style="margin-top:12px">
+        <li><span class="ic"><%- icon('mail', 18) %></span><span class="js-mail-static" data-u="geral" data-d="incubtrans.eu">geral [at] incubtrans.eu</span></li>
+        <li><span class="ic"><%- icon('phone', 18) %></span>+351 276 100 100</li>
+        <li><span class="ic"><%- icon('calendar', 18) %></span><%= t('contact.horario') %></li>
+      </ul>
+      <hr class="divider">
+      <div class="label" style="margin-top:0"><%= t('contact.parceiros') %></div>
+      <ul class="small" style="padding-left:18px;color:var(--ink-2);line-height:1.9;margin:0">
+        <li>Eurocidade Chaves–Verín AECT (<%= lang === 'es' ? 'jefe de fila' : 'chefe de fila' %>)</li><li>ADRAT</li><li>IPB – Instituto Politécnico de Bragança</li><li>ANJE</li><li>Fundación Galicia Europa</li><li>Universidade de Vigo</li><li>AJE Galicia</li>
+      </ul>
+      <p style="margin-top:16px"><a href="/sobre"><%= t('foot.sobre') %> →</a></p>
+    </aside>
+  </div>
+</div>
+<%- include('partials/foot') %>

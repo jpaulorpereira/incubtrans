@@ -1,0 +1,28 @@
+<%- include('partials/head', { band: { title: t('btn.pesquisar'), sub: q ? `“${q}”` : '' } }) %>
+<div class="wrap page">
+  <div class="searchbar" style="margin:0 0 30px;max-width:none">
+    <form action="/pesquisa" method="get" role="search" style="box-shadow:var(--shadow);border:1px solid var(--line)">
+      <label class="sr" for="q-s"><%= t('btn.pesquisar') %></label>
+      <input id="q-s" name="q" value="<%= q %>" type="search" placeholder="<%= t('hero.searchPh') %>" data-suggest autocomplete="off">
+      <button class="btn"><%- icon('search', 18) %> <%= t('btn.pesquisar') %></button>
+    </form>
+  </div>
+  <% if (q && !offers.length && !entities.length && !places.length) { %><div class="card empty"><%= t('lbl.semResultados') %></div><% } %>
+  <% if (places.length) { %><div class="row" style="margin-bottom:24px"><b><%= t('lbl.localizacao') %>:</b><% places.forEach(p => { %><a class="chip lg" href="/produtos?local=<%= encodeURIComponent(p.municipality) %>"><%= p.municipality %> (<%= country(p.country) %>)</a><% }) %></div><% } %>
+  <% if (entities.length) { %>
+    <h2 style="margin-bottom:16px"><%= lang === 'es' ? 'Entidades' : 'Entidades' %> <span class="muted" style="font-size:16px">(<%= entities.length %>)</span></h2>
+    <div class="grid3" style="margin-bottom:34px">
+      <% entities.forEach(e => { %>
+        <a class="card pad row" style="flex-wrap:nowrap;color:inherit" href="<%= entityPath(e) %>">
+          <div class="logo-box"><% if (e.logo) { %><img src="<%= e.logo %>" alt=""><% } else { %><span class="ini"><%= U.initials(e.short_name || e.name) %></span><% } %></div>
+          <div style="min-width:0"><b><%= e.name %></b><div class="tiny muted"><%= t('lbl.' + e.type) %><%= e.locText ? ' · ' + e.locText : '' %></div></div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+  <% if (offers.length) { %>
+    <h2 style="margin-bottom:16px"><%= t('nav.produtos') %> <span class="muted" style="font-size:16px">(<%= offers.length %>)</span></h2>
+    <div class="grid3"><% offers.forEach(o => { %><%- include('partials/offer-card', { o }) %><% }) %></div>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

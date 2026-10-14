@@ -1,0 +1,30 @@
+<%- include('_head') %>
+<form class="card" style="padding:32px;max-width:980px" method="post" action="/area/ofertas<%= o.id ? '/' + o.id : '' %>?_csrf=<%= csrf %>" enctype="multipart/form-data">
+  <div class="row between" style="margin-bottom:20px"><h2><%= o.id ? t('area.editarOferta') : t('area.novaOferta') %></h2><a href="/area/ofertas" class="small">‹ <%= t('btn.voltar') %></a></div>
+  <% if (typeof errs !== 'undefined' && errs.length) { %><div class="alert error"><ul><% errs.forEach(e => { %><li><%= e %></li><% }) %></ul></div><% } %>
+  <div class="fields3">
+    <div class="field"><label class="l" for="of-k"><%= t('area.tipo') %></label><select class="input" id="of-k" name="kind"><option value="produto" <%= o.kind === 'produto' ? 'selected' : '' %>><%= t('lbl.produto') %></option><option value="servico" <%= o.kind === 'servico' ? 'selected' : '' %>><%= t('lbl.servico') %></option></select></div>
+    <div class="field"><label class="l" for="of-c"><%= t('area.categoria') %></label><select class="input" id="of-c" name="category_id"><option value=""><%= t('area.escolher') %></option><% cats.forEach(c => { %><option value="<%= c.id %>" <%= Number(o.category_id) === c.id ? 'selected' : '' %>><%= lang === 'es' ? c.name_es : c.name_pt %></option><% }) %></select></div>
+    <div class="field"><label class="l" for="of-s"><%= t('area.estado') %></label><select class="input" id="of-s" name="status"><option value="ativo" <%= o.status !== 'inativo' ? 'selected' : '' %>><%= t('lbl.ativo') %></option><option value="inativo" <%= o.status === 'inativo' ? 'selected' : '' %>><%= t('lbl.inativo') %></option></select></div>
+  </div>
+  <div class="fields2">
+    <div class="field"><label class="l" for="of-t"><%= t('area.titulo_') %> (PT)</label><input class="input" id="of-t" name="title_pt" value="<%= o.title_pt || '' %>" maxlength="140"></div>
+    <div class="field"><label class="l" for="of-te"><%= t('area.titulo_') %> (ES) <span class="muted">(<%= t('lbl.opcional') %>)</span></label><input class="input" id="of-te" name="title_es" value="<%= o.title_es || '' %>" maxlength="140"></div>
+    <div class="field"><label class="l" for="of-d"><%= t('area.descricao') %> (PT)</label><textarea class="input" id="of-d" name="desc_pt" maxlength="5000"><%= o.desc_pt || '' %></textarea></div>
+    <div class="field"><label class="l" for="of-de"><%= t('area.descricao') %> (ES) <span class="muted">(<%= t('lbl.opcional') %>)</span></label><textarea class="input" id="of-de" name="desc_es" maxlength="5000"><%= o.desc_es || '' %></textarea></div>
+  </div>
+  <p class="help" style="margin:-8px 0 18px"><%= lang === 'es' ? 'Escribe al menos en un idioma; si falta la traducción, se muestra el original.' : 'Escreva pelo menos num idioma; se faltar a tradução, é apresentado o original.' %></p>
+  <div class="fields3">
+    <div class="field"><label class="l" for="of-pt"><%= t('area.tipoPreco') %></label><select class="input" id="of-pt" name="price_type">
+      <% [['fixo', lang === 'es' ? 'Precio fijo' : 'Preço fixo'], ['negociavel', t('lbl.negociavel')], ['consulta', t('lbl.consulta')], ['gratis', t('lbl.gratis')]].forEach(([v, l]) => { %><option value="<%= v %>" <%= o.price_type === v ? 'selected' : '' %>><%= l %></option><% }) %></select></div>
+    <div class="field"><label class="l" for="of-p"><%= t('area.preco') %></label><input class="input" id="of-p" name="price" inputmode="decimal" placeholder="20,50" value="<%= o.price !== undefined ? o.price : (o.price_cents != null ? (o.price_cents / 100).toFixed(2).replace('.', ',') : '') %>"><p class="help"><%= lang === 'es' ? 'Formato: 20,50 € (solo para precio fijo o negociable).' : 'Formato: 20,50 € (só para preço fixo ou negociável).' %></p></div>
+    <div class="field"><label class="l" for="of-tg"><%= t('area.etiquetas') %></label><input class="input" id="of-tg" name="tags" value="<%= (o.tags || []).join(', ') %>"><p class="help"><%= t('area.etiquetasAj') %></p></div>
+  </div>
+  <div class="field"><span class="l"><%= t('area.imagens') %></span>
+    <% if (o.images && o.images.length) { %><div class="thumbs" style="margin-bottom:12px"><% o.images.forEach(src => { %><label><img src="<%= src %>" alt=""><span class="check tiny" style="margin-top:4px"><input type="checkbox" name="remove_images" value="<%= src %>"> <%= t('area.removerImg') %></span></label><% }) %></div><% } %>
+    <input type="file" name="images" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="of-ih">
+    <p class="help" id="of-ih"><%= t('area.imagensAj') %></p>
+  </div>
+  <div class="row"><button class="btn" style="padding:14px 28px"><%= o.id ? t('btn.guardarAlt') : t('btn.guardar') %></button><a class="btn light" href="/area/ofertas"><%= t('btn.cancelar') %></a></div>
+</form>
+<%- include('_foot') %>

@@ -1,0 +1,36 @@
+<%- include('_head') %>
+<div class="row between" style="margin-bottom:18px">
+  <h2><%= t('area.tabs.ofertas') %> <span class="muted" style="font-size:16px">(<%= offers.length %>)</span></h2>
+  <a class="btn" href="/area/ofertas/nova"><%- icon('plus', 15) %> <%= t('area.novaOferta') %></a>
+</div>
+<p class="alert info"><%= t('area.destaqueRegra') %></p>
+<% if (!offers.length) { %><div class="card empty"><%= t('area.nenhum') %></div><% } %>
+<div class="table-wrap">
+<table class="t">
+  <thead><tr><th><%= t('area.titulo_') %></th><th><%= t('area.tipo') %></th><th><%= t('area.categoria') %></th><th><%= t('area.preco') %></th><th><%= t('area.estado') %></th><th><%= t('lbl.destaque') %></th><th class="actions"></th></tr></thead>
+  <tbody>
+  <% offers.forEach(o => { const pend = hl.find(h => h.offer_id === o.id && h.status === 'pendente'); const rej = hl.find(h => h.offer_id === o.id && h.status === 'rejeitado'); %>
+    <tr id="o<%= o.id %>">
+      <td><div class="row" style="flex-wrap:nowrap;gap:10px"><% if (o.images[0]) { %><img src="<%= o.images[0] %>" alt="" style="width:52px;height:40px;object-fit:cover;border-radius:8px"><% } %><b><%= pick(o, 'title') %></b></div></td>
+      <td><%= kindLabel(o.kind) %></td>
+      <td><%= catName(o) %></td>
+      <td><%= priceLabel(o) %></td>
+      <td><span class="pill <%= o.status %>"><%= statusLabel(o.status) %></span></td>
+      <td class="small">
+        <% if (o.isFeatured) { %><span class="pill violet"><%= t('area.destaqueAtivo') %> <%= U.formatDate(o.featured_until) %></span>
+        <% } else if (pend) { %><span class="pill pendente"><%= t('area.destaquePendente') %></span>
+        <% } else if (o.status === 'ativo' && canHighlight) { %><form method="post" action="/area/ofertas/<%= o.id %>/destaque" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn light sm"><%= t('btn.pedirDestaque') %></button></form>
+        <% } else { %><span class="muted">—</span><% } %>
+        <% if (rej && !o.isFeatured && !pend && rej.reason) { %><div class="tiny muted"><%= statusLabel('rejeitada') %>: <%= rej.reason %></div><% } %>
+      </td>
+      <td class="actions">
+        <a class="btn ghost sm" href="/area/ofertas/<%= o.id %>"><%= t('btn.editar') %></a>
+        <form method="post" action="/area/ofertas/<%= o.id %>/estado" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn light sm"><%= o.status === 'ativo' ? t('btn.desativar') : t('btn.ativar') %></button></form>
+        <form method="post" action="/area/ofertas/<%= o.id %>/eliminar" class="inline js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= t('btn.eliminar') %></button></form>
+      </td>
+    </tr>
+  <% }) %>
+  </tbody>
+</table>
+</div>
+<%- include('_foot') %>

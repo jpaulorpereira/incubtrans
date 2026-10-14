@@ -1,0 +1,23 @@
+<%- include('_head') %>
+<section class="card pad">
+  <div class="row between"><h2 style="font-size:20px"><%= t('area.tabs.avaliacoes') %></h2>
+    <span><%= rating.n ? `${String(rating.avg).replace('.', ',')} ★ · ${rating.n} ${rating.n === 1 ? t('lbl.avaliacao') : t('lbl.avaliacoes').toLowerCase()}` : '' %></span></div>
+  <p class="help" style="margin:6px 0 10px"><%= lang === 'es' ? 'Las valoraciones las hacen visitantes sin cuenta, confirmadas por email. Puedes responder públicamente o denunciar una valoración al administrador.' : 'As avaliações são feitas por visitantes sem conta, confirmadas por email. Pode responder publicamente ou denunciar uma avaliação ao administrador.' %></p>
+  <% if (!reviews.length) { %><p class="muted"><%= t('lbl.semAvaliacoes') %></p><% } %>
+  <% reviews.forEach(r => { %>
+    <div class="review">
+      <div class="row between"><div class="row" style="gap:10px"><%- include('../partials/stars', { n: r.rating }) %><b><%= r.author_name || t('review.anonimo') %></b></div><span class="tiny muted"><%= U.formatDate(r.created_at) %></span></div>
+      <% if (r.comment) { %><p style="margin-top:8px;color:var(--ink-2)"><%= r.comment %></p><% } %>
+      <form method="post" action="/area/avaliacoes/<%= r.id %>/responder" style="margin-top:12px">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <label class="l" for="rp<%= r.id %>"><%= t('area.resposta') %></label>
+        <textarea class="input" id="rp<%= r.id %>" name="reply" maxlength="1500" style="min-height:70px"><%= r.reply || '' %></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn sm"><%= t('btn.responder') %></button></div>
+      </form>
+      <details style="margin-top:8px"><summary class="tiny muted" style="cursor:pointer"><%= t('area.denunciarAval') %></summary>
+        <form method="post" action="/area/avaliacoes/<%= r.id %>/denunciar" class="row" style="margin-top:8px"><input type="hidden" name="_csrf" value="<%= csrf %>"><input class="input" name="details" placeholder="<%= t('report.detalhes') %>" style="max-width:420px"><button class="btn danger sm"><%= t('btn.denunciar') %></button></form>
+      </details>
+    </div>
+  <% }) %>
+</section>
+<%- include('_foot') %>

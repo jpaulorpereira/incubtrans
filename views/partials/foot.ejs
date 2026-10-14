@@ -1,0 +1,49 @@
+</main>
+<section class="partners" aria-label="<%= t('contact.parceiros') %>">
+  <div class="wrap">
+    <img src="/img/partners/aect.png" alt="Eurocidade Chaves–Verín AECT" loading="lazy">
+    <img src="/img/partners/adrat.png" alt="ADRAT" loading="lazy">
+    <img src="/img/partners/ipb.png" alt="Instituto Politécnico de Bragança" loading="lazy">
+    <img src="/img/partners/anje.png" alt="ANJE" loading="lazy">
+    <img src="/img/partners/fge.png" alt="Fundación Galicia Europa" loading="lazy">
+    <img src="/img/partners/uvigo.png" alt="Universidade de Vigo" loading="lazy">
+    <img src="/img/partners/aje.png" alt="AJE Galicia" loading="lazy">
+  </div>
+</section>
+<footer class="ftr">
+  <div class="wrap">
+    <div>
+      <b>© <%= new Date().getFullYear() %> INCUBTRANS</b>
+      <nav aria-label="<%= lang === 'es' ? 'Pie de página' : 'Rodapé' %>">
+        <a href="/sobre"><%= t('foot.sobre') %></a>
+        <a href="/como-funciona"><%= t('foot.comoFunciona') %></a>
+        <a href="/contactos"><%= t('foot.contactos') %></a>
+        <a href="/termos"><%= t('foot.termos') %></a>
+        <a href="/privacidade"><%= t('foot.privacidade') %></a>
+        <a href="#" class="js-cookie-open"><%= t('cookies.gerir') %></a>
+      </nav>
+    </div>
+    <p class="fund"><%= t('foot.funding') %></p>
+  </div>
+</footer>
+<div class="cookie" id="cookie" <%= consentSet ? 'hidden' : '' %> role="dialog" aria-label="Cookies">
+  <form method="post" action="/cookies">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="back" value="<%= path %>">
+    <p><%= t('cookies.text') %> <a href="/privacidade"><%= t('cookies.link') %></a>.</p>
+    <details>
+      <summary><%= t('btn.configurar') %></summary>
+      <label class="check" style="margin-top:8px"><input type="checkbox" checked disabled> <%= t('cookies.necessarios') %></label>
+      <label class="check" style="margin-top:6px"><input type="checkbox" name="maps" value="1" <%= consentMaps ? 'checked' : '' %>> <%= t('cookies.mapas') %></label>
+      <button class="btn sm ghost" style="margin-top:10px"><%= t('cookies.guardar') %></button>
+    </details>
+    <div class="row">
+      <button class="btn" name="maps" value="1"><%= t('btn.aceitarTodos') %></button>
+      <button class="btn ghost" name="maps" value="0"><%= t('btn.rejeitar') %></button>
+    </div>
+  </form>
+</div>
+<script src="/static/js/app.js" defer></script>
+<% if (typeof needMap !== 'undefined' && needMap && consentMaps) { %><script src="/static/vendor/leaflet/leaflet.js" defer></script><script src="/static/js/map.js" defer></script><% } %>
+</body>
+</html>

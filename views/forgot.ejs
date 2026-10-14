@@ -1,0 +1,13 @@
+<%- include('partials/head', { band: { title: t('auth.recuperarT'), back: [t('btn.entrar'), '/entrar'] } }) %>
+<div class="wrap page" style="max-width:620px">
+  <form class="card" style="padding:36px" method="post" action="/recuperar">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <h2><%= t('auth.recuperarT') %></h2>
+    <p class="muted" style="margin:8px 0 22px"><%= t('auth.recuperarS') %></p>
+    <% if (err) { %><div class="alert error"><%= err %></div><% } %>
+    <% if (sent) { %><div class="alert ok" role="status"><%= t('auth.recuperarOk') %></div><% } %>
+    <div class="field"><label class="l" for="fg-e"><%= t('auth.email') %></label><input class="input" id="fg-e" name="email" type="email" required autocomplete="email"></div>
+    <button class="btn"><%= t('btn.enviar') %></button>
+  </form>
+</div>
+<%- include('partials/foot') %>

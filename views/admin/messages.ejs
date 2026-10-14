@@ -1,0 +1,14 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px;margin-bottom:14px"><%= tr('Mensagens do formulário de contacto', 'Mensajes del formulario de contacto') %></h2>
+  <% if (!rows.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+  <% rows.forEach(m => { %>
+    <div class="item-row" style="<%= m.handled ? 'opacity:.6' : '' %>">
+      <div class="row between"><div><b><%= m.name %></b> &lt;<a href="mailto:<%= m.email %>"><%= m.email %></a>&gt; <span class="muted small"><%= m.organization || '' %></span></div><span class="tiny muted"><%= U.formatDate(m.created_at) %></span></div>
+      <div class="small" style="margin-top:4px"><b><%= m.subject %></b></div>
+      <p style="white-space:pre-line;color:var(--ink-2);margin-top:4px"><%= m.message %></p>
+      <form method="post" action="/gestao/mensagens/<%= m.id %>" style="margin-top:8px"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn <%= m.handled ? 'light' : 'ok' %> sm"><%= m.handled ? tr('Marcar como por tratar', 'Marcar como pendiente') : tr('Marcar como tratada', 'Marcar como tratada') %></button></form>
+    </div>
+  <% }) %>
+</section>
+<%- include('_foot') %>

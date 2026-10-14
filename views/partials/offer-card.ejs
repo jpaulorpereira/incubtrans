@@ -1,0 +1,17 @@
+<a class="card offer" href="/produtos/<%= o.slug %>" id="o<%= o.id %>">
+  <div class="media">
+    <% if (o.images[0]) { %><img src="<%= o.images[0] %>" alt="" loading="lazy"><% } else { %><div class="ph" aria-hidden="true"><%= U.initials(pick(o, 'title')) %></div><% } %>
+    <% if (o.isFeatured) { %><span class="badge-promo"><%= t('lbl.destaque') %></span><% } %>
+    <span class="badge-kind"><%= kindLabel(o.kind) %></span>
+  </div>
+  <div class="body">
+    <div class="t"><h3><%= pick(o, 'title') %></h3><div class="price"><%= priceLabel(o) %></div></div>
+    <p class="desc"><%= pick(o, 'desc') %></p>
+    <div class="chips"><% if (catName(o)) { %><span class="chip" style="background:#F1ECFB;color:#6D44C9"><%= catName(o) %></span><% } %><% o.tags.slice(0, 3).forEach(tag => { %><span class="chip"><%= tag %></span><% }) %></div>
+    <div class="seller">
+      <div class="avatar" aria-hidden="true"><%= U.initials(o.seller) %></div>
+      <div style="min-width:0"><div class="n"><%= o.seller %></div><div class="l"><%= o.loc ? o.loc.replace('Espanha', country('Espanha')) : '' %></div></div>
+      <span class="more"><%= t('btn.verDetalhes') %> →</span>
+    </div>
+  </div>
+</a>

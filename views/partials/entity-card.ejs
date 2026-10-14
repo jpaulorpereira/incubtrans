@@ -1,0 +1,23 @@
+<% const base = e.type === 'incubadora' ? '/incubadoras/' : e.type === 'agente' ? '/agentes/' : '/empresas/'; %>
+<article class="card entity">
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+  <div class="head">
+    <div class="logo-box"><% if (e.logo) { %><img src="<%= e.logo %>" alt="" loading="lazy"><% } else { %><span class="ini"><%= U.initials(e.short_name || e.name) %></span><% } %></div>
+    <div style="min-width:0">
+      <h3><a href="<%= base + e.slug %>" style="color:inherit"><%= e.name %></a></h3>
+      <div class="meta">
+        <% if (e.locText) { %><span><%- icon('pin', 14) %> <%= e.locText %></span><% } %>
+        <% if (e.year) { %><span><%- icon('calendar', 14) %> <%= t('lbl.desde') %> <%= e.year %></span><% } %>
+        <% if (e.type === 'incubadora' && e.startups) { %><span><%- icon('users', 14) %> <%= e.startups %> <%= t('lbl.startups') %></span><% } %>
+        <% if (e.type === 'agente' && e.activeProjects) { %><span><%- icon('briefcase', 14) %> <%= e.activeProjects %> <%= t('lbl.projetosAtivos').toLowerCase() %></span><% } %>
+      </div>
+    </div>
+  </div>
+  <p class="desc"><%= pick(e, 'desc') %></p>
+  <% if (e.areas.length) { %>
+    <div class="label"><%= e.type === 'incubadora' ? t('lbl.especializacoes') : t('lbl.areasAtuacao') %></div>
+    <div class="chips"><% e.areas.slice(0, 5).forEach(a => { %><span class="chip"><%= a %></span><% }) %></div>
+  <% } %>
+  <div class="foot" style="margin-top:auto;padding-top:22px"><a class="btn block" href="<%= base + e.slug %>"><%= t('btn.verCompleto') %></a></div>
+  </div>
+</article>

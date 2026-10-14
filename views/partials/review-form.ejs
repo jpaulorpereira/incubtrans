@@ -1,0 +1,17 @@
+<form method="post" action="/avaliar/<%= e.slug %>" id="avaliar" class="card pad" style="margin-top:22px">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <input type="hidden" name="back" value="<%= path %>">
+  <h2 style="font-size:19px"><%= t('review.title') %></h2>
+  <p class="muted small" style="margin:6px 0 16px"><%= t('review.sub') %></p>
+  <fieldset style="border:none;padding:0;margin:0 0 14px">
+    <legend class="l"><%= t('review.nota') %></legend>
+    <div class="stars"><% for (let i = 5; i >= 1; i--) { %><input type="radio" id="st<%= i %>" name="rating" value="<%= i %>" required><label for="st<%= i %>" title="<%= i %>/5">★</label><% } %></div>
+  </fieldset>
+  <div class="field"><label class="l" for="rv-c"><%= t('review.comentario') %> <span class="muted">(<%= t('lbl.opcional') %>)</span></label><textarea class="input" id="rv-c" name="comment" maxlength="1500" style="min-height:80px"></textarea></div>
+  <div class="fields2">
+    <div class="field"><label class="l" for="rv-n"><%= t('review.nome') %> <span class="muted">(<%= t('lbl.opcional') %>)</span></label><input class="input" id="rv-n" name="name" maxlength="60"></div>
+    <div class="field"><label class="l" for="rv-e"><%= t('review.email') %></label><input class="input" id="rv-e" name="email" type="email" required autocomplete="email"></div>
+  </div>
+  <%- include('captcha', { form: 'review', captcha }) %>
+  <button class="btn"><%= t('btn.enviar') %></button>
+</form>

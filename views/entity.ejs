@@ -1,0 +1,112 @@
+<% const isInc = e.type === 'incubadora'; const base = isInc ? '/incubadoras' : '/agentes'; const active = isInc ? programs.filter(p => p.status === 'ativo').length : projects.filter(p => p.status === 'ativo').length;
+   const jsonld = { '@context': 'https://schema.org', '@type': 'Organization', name: e.name, description: pick(e, 'desc'), url: `${baseUrl}${base}/${e.slug}`, ...(e.website ? { sameAs: [e.website, ...e.socials.map(s => s.url)] } : {}) }; %>
+<%- include('partials/head', { band: { title: t(isInc ? 'nav.incubadoras' : 'nav.agentes'), back: [isInc ? (lang === 'es' ? 'Volver a Incubadoras' : 'Voltar às Incubadoras') : (lang === 'es' ? 'Volver a Agentes' : 'Voltar aos Agentes'), base] }, metaDesc: pick(e, 'desc'), jsonld, needMap: true }) %>
+<div class="wrap page">
+  <% if (e.cover) { %><div class="cover"><img src="<%= e.cover %>" alt=""></div><% } %>
+  <div class="detail">
+    <div class="stack">
+      <section class="card pad" style="position:relative">
+        <div class="row" style="flex-wrap:nowrap;gap:18px">
+          <div class="logo-box lg"><% if (e.logo) { %><img src="<%= e.logo %>" alt="<%= e.name %>"><% } else { %><span class="ini" style="font-size:36px"><%= U.initials(e.short_name || e.name) %></span><% } %></div>
+          <div>
+            <h1 style="font-size:26px"><%= e.name %></h1>
+            <div class="meta"><% if (e.locText) { %><span><%- icon('pin', 14) %> <%= e.locText %></span><% } %><% if (e.year) { %><span><%- icon('calendar', 14) %> <%= t('lbl.desde') %> <%= e.year %></span><% } %></div>
+          </div>
+        </div>
+        <div class="kpis" style="margin-top:22px">
+          <% if (isInc) { %>
+            <div class="kpi" style="background:#EAF4FD;color:var(--blue)"><b><%= e.startups || incubated.length %></b><span><%= t('lbl.startupsInc') %></span></div>
+            <div class="kpi" style="background:var(--ok-bg);color:var(--ok)"><b><%= active %></b><span><%= t('lbl.programasAtivos') %></span></div>
+          <% } else { %>
+            <div class="kpi" style="background:#EAF4FD;color:var(--blue)"><b><%= projects.length %></b><span><%= t('lbl.projetos') %></span></div>
+            <div class="kpi" style="background:var(--ok-bg);color:var(--ok)"><b><%= active %></b><span><%= t('lbl.projetosAtivos') %></span></div>
+          <% } %>
+          <div class="kpi" style="background:var(--violet-bg);color:var(--violet)"><b><%= e.year ? new Date().getFullYear() - e.year : '—' %></b><span><%= t('lbl.anosExp') %></span></div>
+        </div>
+        <h2 style="font-size:18px;margin-top:24px"><%= t('lbl.missao') %></h2>
+        <div style="color:var(--ink-2);font-size:15.5px;line-height:1.65;margin-top:8px;white-space:pre-line"><%= pick(e, 'desc') %></div>
+        <% if (isFallback(e, 'desc')) { %><p class="tiny muted" style="margin-top:8px"><%= t('lbl.original') %></p><% } %>
+        <% if (e.areas.length) { %><div class="label"><%= isInc ? t('lbl.especializacoes') : t('lbl.areasAtuacao') %></div><div class="chips"><% e.areas.forEach(a => { %><a class="chip lg" href="<%= base %>?area=<%= encodeURIComponent(a) %>"><%= a %></a><% }) %></div><% } %>
+        <% if (isInc && e.services.length) { %><div class="label"><%= t('lbl.servicos') %></div><div class="chips"><% e.services.forEach(s => { %><span class="chip lg" style="background:var(--ok-bg);color:var(--ok)"><%= s %></span><% }) %></div><% } %>
+        <% if (!isInc && pick(e, 'support')) { %><div class="label"><%= t('lbl.apoio') %></div><p style="color:var(--ink-2)"><%= pick(e, 'support') %></p><% } %>
+      </section>
+
+      <% if (isInc) { %>
+      <section class="card pad">
+        <h2 style="font-size:20px;margin-bottom:16px"><%= t('lbl.programas') %></h2>
+        <% if (!programs.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+        <% programs.forEach(p => { %>
+          <div class="item-row"><div class="row between"><b style="font-family:var(--display)"><%= p.name %></b><span class="row" style="gap:8px"><% if (p.duration_months) { %><span class="pill neutral"><%= p.duration_months %> <%= t('lbl.meses') %></span><% } %><span class="pill <%= p.status %>"><%= statusLabel(p.status) %></span></span></div>
+          <% if (p.description) { %><p class="small" style="color:var(--muted);margin-top:6px"><%= p.description %></p><% } %></div>
+        <% }) %>
+      </section>
+      <section class="card pad">
+        <h2 style="font-size:20px;margin-bottom:16px"><%= t('lbl.incubadas') %> <span class="muted" style="font-size:15px">(<%= incubated.length %>)</span></h2>
+        <% if (!incubated.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+        <div class="grid2" style="gap:12px">
+        <% incubated.forEach(c => { %>
+          <div class="row" style="flex-wrap:nowrap;border:1px solid var(--line);border-radius:14px;padding:12px">
+            <div class="logo-box" style="width:46px;height:46px;border-radius:12px"><% if (c.logo) { %><img src="<%= c.logo %>" alt=""><% } else { %><span class="ini" style="font-size:18px"><%= U.initials(c.name) %></span><% } %></div>
+            <div style="min-width:0"><b><%= c.name %></b><div class="tiny muted"><%= [c.area, c.year].filter(Boolean).join(' · ') %></div>
+              <% if (c.website) { %><a class="tiny" href="<%= U.normUrl(c.website) %>" target="_blank" rel="noopener nofollow"><%= U.displayUrl(c.website) %> <%- icon('ext', 11) %></a><% } %></div>
+          </div>
+        <% }) %>
+        </div>
+      </section>
+      <% } else { %>
+      <section class="card pad">
+        <h2 style="font-size:20px;margin-bottom:16px"><%= t('lbl.projetos') %></h2>
+        <% if (!projects.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+        <% projects.forEach(p => { %>
+          <div class="item-row">
+            <div class="row between"><b style="font-family:var(--display)"><%= p.name %></b><span class="pill <%= p.status %>"><%= statusLabel(p.status) %></span></div>
+            <% if (p.description) { %><p class="small" style="color:var(--muted);margin-top:6px"><%= p.description %></p><% } %>
+            <div class="meta">
+              <% if (p.start_date || p.end_date) { %><span><%- icon('calendar', 14) %> <%= U.formatDate(p.start_date) %> – <%= U.formatDate(p.end_date) %></span><% } %>
+              <% if (p.website) { %><a href="<%= U.normUrl(p.website) %>" target="_blank" rel="noopener nofollow"><%- icon('globe', 14) %> <%= U.displayUrl(p.website) %></a><% } %>
+            </div>
+            <% if (p.partners) { %><p class="tiny muted" style="margin-top:6px"><b><%= t('lbl.parceiros') %>:</b> <%= p.partners %></p><% } %>
+          </div>
+        <% }) %>
+      </section>
+      <% } %>
+
+      <section class="card pad">
+        <h2 style="font-size:20px;margin-bottom:10px"><%= t('lbl.eventos') %></h2>
+        <% if (!posts.length) { %><p class="muted"><%= t('lbl.semDados') %></p><% } %>
+        <% posts.forEach(p => { const d = new Date(p.date + 'T00:00:00'); %>
+          <div class="post">
+            <div class="date-box"><b><%= d.getDate() %></b><span><%= d.toLocaleDateString(lang === 'es' ? 'es-ES' : 'pt-PT', { month: 'short' }).replace('.', '') %> <%= d.getFullYear() %></span></div>
+            <div><span class="pill <%= p.kind === 'evento' ? 'violet' : 'blue' %>"><%= p.kind === 'evento' ? t('lbl.evento') : t('lbl.noticia') %></span>
+              <h3 style="font-size:16px;margin-top:6px"><%= p.title %></h3>
+              <% if (p.place) { %><div class="tiny muted"><%- icon('pin', 12) %> <%= p.place %></div><% } %>
+              <% if (p.body) { %><p class="small" style="color:var(--muted);margin-top:4px;white-space:pre-line"><%= p.body %></p><% } %>
+              <% if (p.image) { %><img src="<%= p.image %>" alt="" style="margin-top:8px;border-radius:10px;max-height:200px" loading="lazy"><% } %>
+            </div>
+          </div>
+        <% }) %>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card pad">
+        <h2 style="font-size:20px"><%= t('lbl.contactos') %></h2>
+        <div style="margin-top:14px"><%- include('partials/contacts', { e, offerId: null }) %></div>
+        <% if (e.locations.length) { %>
+          <hr class="divider">
+          <div class="label" style="margin-top:0"><%= t('lbl.localizacoes') %></div>
+          <% e.locations.forEach(l => { %>
+            <div style="border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px">
+              <b class="small"><%= [l.municipality, country(l.country)].filter(Boolean).join(', ') %></b>
+              <% if (l.address) { %><div class="small muted"><%= l.address %></div><% } %>
+              <% if (l.phone) { %><div class="small"><a href="/contacto/<%= e.id %>/local/<%= l.id %>?k=telefone" rel="nofollow"><%= l.phone %></a></div><% } %>
+              <% if (l.email) { const [u, d] = l.email.split('@'); %><div class="small"><a href="/contacto/<%= e.id %>/local/<%= l.id %>?k=email" rel="nofollow" class="js-mail" data-u="<%= u %>" data-d="<%= d %>"><%= u %> [at] <%= d %></a></div><% } %>
+            </div>
+          <% }) %>
+          <% if (consentMaps) { %><div class="mini-map" id="map" data-mode="entity" data-points='<%= JSON.stringify(e.locations.filter(l => l.plat).map(l => ({ lat: l.plat, lng: l.plng, name: e.name, place: [l.address, l.municipality].filter(Boolean).join(", "), type: e.type }))) %>'></div><% } %>
+        <% } %>
+        <p style="margin-top:16px"><a class="tiny muted" href="/denunciar/entidade/<%= e.id %>?voltar=<%= encodeURIComponent(path) %>" rel="nofollow"><%- icon('flag', 13) %> <%= t('btn.denunciar') %></a></p>
+      </div>
+    </aside>
+  </div>
+</div>
+<%- include('partials/foot', { needMap: true }) %>

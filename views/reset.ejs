@@ -1,0 +1,12 @@
+<%- include('partials/head', { band: { title: t('auth.novaPassT') } }) %>
+<div class="wrap page" style="max-width:620px">
+  <form class="card" style="padding:36px" method="post" action="/recuperar/<%= token %>">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <h2><%= t('auth.novaPassT') %></h2>
+    <% if (err) { %><div class="alert error" style="margin-top:16px"><%= err %></div><% } %>
+    <div class="field" style="margin-top:20px"><label class="l" for="rs-p"><%= t('area.passNova') %></label><input class="input" id="rs-p" name="password" type="password" required minlength="8" autocomplete="new-password"><p class="help"><%= t('auth.politicaPass') %></p></div>
+    <div class="field"><label class="l" for="rs-p2"><%= t('auth.confirmPass') %></label><input class="input" id="rs-p2" name="password2" type="password" required autocomplete="new-password"></div>
+    <button class="btn"><%= t('btn.guardar') %></button>
+  </form>
+</div>
+<%- include('partials/foot') %>

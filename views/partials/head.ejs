@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="<%= lang === 'es' ? 'es' : 'pt-PT' %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title && title !== t('site.name') ? `${title} · ${t('site.name')}` : `${t('site.name')} · ${t('site.tagline')}` %></title>
+<meta name="description" content="<%= typeof metaDesc !== 'undefined' && metaDesc ? String(metaDesc).slice(0, 160) : t('site.tagline') %>">
+<link rel="alternate" hreflang="pt" href="<%= baseUrl %><%= path %>?lang=pt">
+<link rel="alternate" hreflang="es" href="<%= baseUrl %><%= path %>?lang=es">
+<meta property="og:title" content="<%= title %>">
+<meta property="og:site_name" content="<%= t('site.name') %>">
+<% if (typeof ogImage !== 'undefined' && ogImage) { %><meta property="og:image" content="<%= baseUrl %><%= ogImage %>"><% } %>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/app.css">
+<% if (typeof needMap !== 'undefined' && needMap && consentMaps) { %><link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css"><% } %>
+<% if (typeof jsonld !== 'undefined' && jsonld) { %><script type="application/ld+json"><%- JSON.stringify(jsonld).replace(/</g, '\\u003c') %></script><% } %>
+</head>
+<body>
+<a class="skip" href="#conteudo"><%= lang === 'es' ? 'Saltar al contenido' : 'Saltar para o conteúdo' %></a>
+<% const sec = path === '/' ? 'home' : path.startsWith('/produtos') || path.startsWith('/empresas') ? 'produtos' : path.startsWith('/incubadoras') ? 'incubadoras' : path.startsWith('/agentes') ? 'agentes' : path.startsWith('/mapa') ? 'mapa' : (path.startsWith('/entrar') || path.startsWith('/registo') || path.startsWith('/area') || path.startsWith('/gestao') || path.startsWith('/recuperar')) ? 'acessos' : ''; %>
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="/"><img src="/img/logo-incubtrans-interreg.png" alt="INCUBTRANS — Interreg España–Portugal" width="294" height="58"></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav"><%= t('nav.menu') %></button>
+    <nav class="nav" id="nav" aria-label="<%= lang === 'es' ? 'Navegación principal' : 'Navegação principal' %>">
+      <a href="/" class="<%= sec === 'home' ? 'on' : '' %>"><%= t('nav.home') %></a>
+      <a href="/produtos" class="<%= sec === 'produtos' ? 'on' : '' %>"><%= t('nav.produtos') %></a>
+      <a href="/incubadoras" class="<%= sec === 'incubadoras' ? 'on' : '' %>"><%= t('nav.incubadoras') %></a>
+      <a href="/agentes" class="<%= sec === 'agentes' ? 'on' : '' %>"><%= t('nav.agentes') %></a>
+      <a href="/mapa" class="<%= sec === 'mapa' ? 'on' : '' %>"><%= t('nav.mapa') %></a>
+      <% if (user) { %>
+        <a href="<%= user.role === 'admin' ? '/gestao' : '/area' %>" class="<%= sec === 'acessos' ? 'on' : '' %>"><%= user.role === 'admin' ? t('nav.gestao') : t('nav.area') %></a>
+        <form method="post" action="/sair" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="linkbtn" style="padding:8px 10px;color:#51607A;font-weight:500;font-size:14.5px"><%= t('nav.sair') %></button></form>
+      <% } else { %>
+        <a href="/entrar" class="cta"><%= t('nav.entrar') %></a>
+      <% } %>
+    </nav>
+    <div class="langs" role="group" aria-label="<%= lang === 'es' ? 'Idioma' : 'Idioma' %>">
+      <a href="<%= qs({ lang: 'pt' }) %>" class="<%= lang === 'pt' ? 'on' : '' %>" lang="pt" aria-current="<%= lang === 'pt' %>">PT</a>
+      <a href="<%= qs({ lang: 'es' }) %>" class="<%= lang === 'es' ? 'on' : '' %>" lang="es" aria-current="<%= lang === 'es' %>">ES</a>
+    </div>
+  </div>
+</header>
+<% if (typeof band !== 'undefined' && band) { %>
+<div class="band"><div class="wrap">
+  <h1><%= band.title %></h1>
+  <% if (band.sub) { %><div class="sub"><%= band.sub %></div><% } %>
+  <% if (band.back) { %><a class="back" href="<%= band.back[1] %>">‹ <%= band.back[0] %></a><% } %>
+</div></div>
+<% } %>
+<main id="conteudo">
+<% if (flash) { %><div class="wrap" style="padding-top:20px"><div class="alert <%= flash.type %>" role="status"><%= flash.msg %></div></div><% } %>

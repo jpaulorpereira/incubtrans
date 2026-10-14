@@ -1,0 +1,42 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= tr('Denúncias', 'Denuncias') %></h2>
+  <p class="muted" style="margin:6px 0 16px"><%= tr('Decida se o conteúdo denunciado se mantém ou é removido. Para entidades, use a suspensão da conta.', 'Decide si el contenido denunciado se mantiene o se elimina. Para entidades, usa la suspensión de la cuenta.') %></p>
+  <div class="filters-row"><% ['aberta', 'mantida', 'removida'].forEach(s => { %><a href="?estado=<%= s %>" class="<%= status === s ? 'on' : '' %>"><%= { aberta: tr('Abertas', 'Abiertas'), mantida: tr('Mantidas', 'Mantenidas'), removida: tr('Removidas', 'Eliminadas') }[s] %></a><% }) %></div>
+  <div class="table-wrap"><table class="t">
+    <thead><tr><th><%= tr('Conteúdo', 'Contenido') %></th><th><%= t('report.motivo') %></th><th><%= t('lbl.periodo') %></th><th class="actions"></th></tr></thead>
+    <tbody>
+      <% if (!reports.length) { %><tr><td colspan="4" class="muted"><%= t('lbl.semDados') %></td></tr><% } %>
+      <% reports.forEach(r => { %>
+        <tr><td><span class="pill neutral"><%= r.target_type %></span> <% if (r.url) { %><a href="<%= r.url %>" target="_blank"><%= r.label %></a><% } else { %><%= r.label %><% } %></td>
+          <td class="small"><b><%= t('report.motivos.' + r.reason) %></b><% if (r.details) { %><div class="muted"><%= r.details %></div><% } %></td>
+          <td class="small"><%= U.formatDate(r.created_at) %></td>
+          <td class="actions"><% if (r.status === 'aberta') { %>
+            <form method="post" action="/gestao/denuncias/<%= r.id %>/manter" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn ghost sm"><%= tr('Manter', 'Mantener') %></button></form>
+            <% if (r.exists && r.target_type !== 'entidade') { %><form method="post" action="/gestao/denuncias/<%= r.id %>/remover" class="inline js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= tr('Remover conteúdo', 'Eliminar contenido') %></button></form><% } %>
+          <% } else { %><span class="pill <%= r.status %>"><%= r.status %></span><% } %></td></tr>
+      <% }) %>
+    </tbody>
+  </table></div>
+</section>
+<div class="grid2" style="margin-top:24px;align-items:start">
+  <section class="card pad">
+    <h2 style="font-size:19px;margin-bottom:12px"><%= tr('Avaliações publicadas recentes', 'Valoraciones publicadas recientes') %></h2>
+    <% reviews.forEach(r => { %>
+      <div class="item-row row between" style="flex-wrap:nowrap;align-items:flex-start">
+        <div><%- include('../partials/stars', { n: r.rating }) %> <b><%= r.name %></b><p class="small" style="color:var(--muted)"><%= r.comment || '—' %></p><span class="tiny muted"><%= r.author_name || '' %> · <%= U.formatDate(r.created_at) %></span></div>
+        <form method="post" action="/gestao/conteudos/avaliacao/<%= r.id %>/remover" class="js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= tr('Remover', 'Eliminar') %></button></form>
+      </div>
+    <% }) %>
+  </section>
+  <section class="card pad">
+    <h2 style="font-size:19px;margin-bottom:12px"><%= tr('Produtos e serviços recentes', 'Productos y servicios recientes') %></h2>
+    <% offers.forEach(o => { %>
+      <div class="item-row row between" style="flex-wrap:nowrap">
+        <div><a href="/produtos/<%= o.slug %>" target="_blank"><b><%= pick(o, 'title') %></b></a><div class="tiny muted"><%= o.seller %> · <%= kindLabel(o.kind) %> · <%= U.formatDate(o.created_at) %> · <span class="pill <%= o.status %>"><%= statusLabel(o.status) %></span></div></div>
+        <form method="post" action="/gestao/conteudos/oferta/<%= o.id %>/remover" class="js-confirm" data-confirm="<%= t('area.confirmEliminar') %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn danger sm"><%= tr('Remover', 'Eliminar') %></button></form>
+      </div>
+    <% }) %>
+  </section>
+</div>
+<%- include('_foot') %>

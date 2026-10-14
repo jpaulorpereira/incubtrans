@@ -1,0 +1,78 @@
+<%- include('partials/head', { metaDesc: t('hero.sub'), needMap: true }) %>
+<section class="hero">
+  <div class="inner">
+    <h1><%= t('hero.title') %></h1>
+    <p><%= t('hero.sub') %></p>
+    <div class="searchbar">
+      <form action="/pesquisa" method="get" role="search">
+        <label class="sr" for="q-home"><%= t('btn.pesquisar') %></label>
+        <input id="q-home" name="q" type="search" placeholder="<%= t('hero.searchPh') %>" autocomplete="off" data-suggest>
+        <button class="btn"><%- icon('search', 18) %> <%= t('btn.pesquisar') %></button>
+      </form>
+    </div>
+    <div class="ctas">
+      <a href="/produtos"><%= t('hero.cta1') %></a>
+      <a href="/incubadoras"><%= t('hero.cta2') %></a>
+      <a href="/agentes"><%= t('hero.cta3') %></a>
+    </div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="grid4 statcards">
+    <% [['store', counts.offers, 'stats.produtos', '/produtos'], ['users', counts.empresas, 'stats.empresas', '/produtos'], ['building', counts.incubadoras, 'stats.incubadoras', '/incubadoras'], ['pin', counts.territorios, 'stats.territorios', '/mapa']].forEach(([ic, v, l, href]) => { %>
+      <a class="card stat" href="<%= href %>" style="color:inherit;text-decoration:none"><div class="ico"><%- icon(ic, 22) %></div><div class="v"><%= v %></div><div class="l"><%= t(l) %></div></a>
+    <% }) %>
+  </div>
+
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.categoriasT') %></h2><p><%= t('home.categoriasS') %></p></div></div>
+    <div class="cats">
+      <% cats.forEach((c) => { %>
+        <a class="card cat" href="/produtos?categoria=<%= c.id %>"><span class="ico"><%- icon(CATEGORY_ICON[(c.id - 1) % CATEGORY_ICON.length], 21) %></span><span><%= lang === 'es' ? c.name_es : c.name_pt %><small><%= c.n %> <%= c.n === 1 ? t('lbl.resultado') : t('lbl.resultados') %></small></span></a>
+      <% }) %>
+    </div>
+  </section>
+
+  <% if (featured.length) { %>
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.destaqueT') %></h2><p><%= t('home.destaqueS') %></p></div><a class="btn ghost" href="/produtos"><%= t('btn.verTodos') %> →</a></div>
+    <div class="grid2"><% featured.forEach(o => { %><%- include('partials/offer-card', { o }) %><% }) %></div>
+  </section>
+  <% } %>
+  <% if (recent.length) { %>
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.recentesT') %></h2><p><%= t('home.recentesS') %></p></div><a class="btn ghost" href="/produtos?ordem=recentes"><%= t('btn.verTodos') %> →</a></div>
+    <div class="grid2"><% recent.forEach(o => { %><%- include('partials/offer-card', { o }) %><% }) %></div>
+  </section>
+  <% } %>
+
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.incubT') %></h2><p><%= t('home.incubS') %></p></div><a class="btn ghost" href="/incubadoras"><%= t('btn.verTodos') %> →</a></div>
+    <div class="grid2"><% incubs.forEach(e => { %><%- include('partials/entity-card', { e }) %><% }) %></div>
+  </section>
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.agentT') %></h2><p><%= t('home.agentS') %></p></div><a class="btn ghost" href="/agentes"><%= t('btn.verTodos') %> →</a></div>
+    <div class="grid2"><% agents.forEach(e => { %><%- include('partials/entity-card', { e }) %><% }) %></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><div><h2><%= t('home.mapaT') %></h2><p><%= t('home.mapaS') %></p></div><a class="btn ghost" href="/mapa"><%= t('nav.mapa') %> →</a></div>
+    <% if (consentMaps) { %>
+      <div id="map" data-mode="home" style="height:420px"></div>
+    <% } else { %>
+      <div class="card map-consent">
+        <span style="color:var(--blue)"><%- icon('map', 34) %></span>
+        <b><%= t('map.consentT') %></b><p class="muted" style="max-width:52ch"><%= t('map.consentS') %></p>
+        <form method="post" action="/cookies"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="back" value="/"><button class="btn" name="maps" value="1"><%= t('btn.ativarMapa') %></button></form>
+      </div>
+    <% } %>
+  </section>
+
+  <section class="sec" style="padding-bottom:80px">
+    <div class="cta-band">
+      <div class="cta-box"><h3><%= t('home.ctaEmpresaT') %></h3><p><%= t('home.ctaEmpresaS') %></p><a class="btn" href="/registo?perfil=empresa"><%= t('home.ctaEmpresaT') %> →</a></div>
+      <div class="cta-box alt"><h3><%= t('home.ctaIncubT') %></h3><p><%= t('home.ctaIncubS') %></p><a class="btn" href="/incubadoras"><%= t('hero.cta2') %> →</a></div>
+    </div>
+  </section>
+</div>
+<%- include('partials/foot', { needMap: true }) %>

@@ -1,0 +1,7 @@
+<%- include('../partials/head', { band: { title: t('admin.titulo'), sub: t('admin.sub') } }) %>
+<div class="wrap page">
+  <nav class="tabs" aria-label="<%= t('admin.titulo') %>">
+    <% [['dash', ''], ['contas', '/contas', counts.pend], ['moderacao', '/moderacao', counts.reports], ['destaques', '/destaques', counts.hl], ['categorias', '/categorias'], ['territorios', '/territorios'], ['paginas', '/paginas'], ['emails', '/emails'], ['stats', '/estatisticas'], ['mensagens', '/mensagens', counts.msgs], ['auditoria', '/auditoria'], ['caixa', '/caixa']].forEach(([k, u, n]) => { %>
+      <a href="/gestao<%= u %>" class="<%= tab === k ? 'on' : '' %>"><%= t('admin.tabs.' + k) %><% if (n) { %><span class="num"><%= n %></span><% } %></a>
+    <% }) %>
+  </nav>

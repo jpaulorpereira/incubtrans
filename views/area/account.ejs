@@ -1,0 +1,35 @@
+<%- include('_head') %>
+<div class="grid2" style="align-items:start">
+  <div class="stack">
+    <form class="card pad" method="post" action="/area/conta/dados">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2 style="font-size:19px;margin-bottom:16px"><%= lang === 'es' ? 'Datos de acceso' : 'Dados de acesso' %></h2>
+      <div class="field"><label class="l" for="a-n"><%= t('auth.nomeResp') %></label><input class="input" id="a-n" name="name" value="<%= user.name %>"></div>
+      <div class="field"><span class="l"><%= t('auth.email') %></span><p><%= user.email %> <span class="pill <%= user.status %>"><%= statusLabel(user.status === 'aprovada' ? 'aprovada' : 'pendente') %></span></p></div>
+      <div class="field"><label class="l" for="a-l"><%= t('area.idioma') %></label><select class="input" id="a-l" name="lang"><option value="pt" <%= user.lang === 'pt' ? 'selected' : '' %>>Português</option><option value="es" <%= user.lang === 'es' ? 'selected' : '' %>>Español</option></select></div>
+      <button class="btn"><%= t('btn.guardar') %></button>
+    </form>
+    <form class="card pad" method="post" action="/area/conta/password">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2 style="font-size:19px;margin-bottom:16px"><%= lang === 'es' ? 'Cambiar contraseña' : 'Alterar password' %></h2>
+      <div class="field"><label class="l" for="a-c"><%= t('area.passAtual') %></label><input class="input" id="a-c" name="current" type="password" required autocomplete="current-password"></div>
+      <div class="field"><label class="l" for="a-p"><%= t('area.passNova') %></label><input class="input" id="a-p" name="password" type="password" required minlength="8" autocomplete="new-password"><p class="help"><%= t('auth.politicaPass') %></p></div>
+      <button class="btn"><%= t('btn.guardar') %></button>
+    </form>
+  </div>
+  <div class="stack">
+    <section class="card pad">
+      <h2 style="font-size:19px"><%= t('btn.exportar') %></h2>
+      <p class="muted" style="margin:8px 0 16px"><%= t('area.exportarS') %></p>
+      <a class="btn ghost" href="/area/conta/exportar"><%= t('btn.exportar') %> (JSON)</a>
+    </section>
+    <form class="card pad js-confirm" method="post" action="/area/conta/eliminar" data-confirm="<%= t('area.confirmEliminar') %>" style="border-color:#F1C9C4">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <h2 style="font-size:19px;color:var(--bad)"><%= t('btn.eliminarConta') %></h2>
+      <p class="muted" style="margin:8px 0 16px"><%= t('area.eliminarS') %></p>
+      <div class="field"><label class="l" for="a-x"><%= t('area.eliminarConfirm') %></label><input class="input" id="a-x" name="confirm" autocomplete="off" style="max-width:240px"></div>
+      <button class="btn danger"><%= t('btn.eliminarConta') %></button>
+    </form>
+  </div>
+</div>
+<%- include('_foot') %>

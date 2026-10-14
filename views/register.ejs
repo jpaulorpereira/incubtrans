@@ -1,0 +1,36 @@
+<%- include('partials/head', { band: { title: t('auth.registoT'), back: [t('btn.entrar'), '/entrar'] } }) %>
+<div class="wrap page" style="max-width:900px">
+  <% if (done) { %>
+    <div class="card pad" style="text-align:center;padding:50px">
+      <span style="color:var(--ok)"><%- icon('mail', 44) %></span>
+      <h2 style="margin-top:14px"><%= t('auth.registoOkT') %></h2>
+      <p class="muted" style="margin-top:10px"><%= t('auth.registoOkS', { email: done }) %></p>
+    </div>
+  <% } else { %>
+  <form class="card" style="padding:36px" method="post" action="/registo" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <h2><%= t('auth.registoT') %></h2>
+    <p class="muted" style="margin:8px 0 24px"><%= t('auth.registoS') %></p>
+    <% if (errs.length) { %><div class="alert error" role="alert"><ul><% errs.forEach(e => { %><li><%= e %></li><% }) %></ul></div><% } %>
+    <fieldset style="border:none;padding:0;margin:0 0 22px"><legend class="l"><%= t('auth.perfil') %></legend>
+      <div class="radio-cards">
+        <% [['empresa', 'perfilEmpresa', 'perfilEmpresaD'], ['incubadora', 'perfilIncub', 'perfilIncubD'], ['agente', 'perfilAgente', 'perfilAgenteD']].forEach(([r, l, d]) => { %>
+          <label><input type="radio" name="role" value="<%= r %>" <%= form.role === r ? 'checked' : '' %> required><b><%= t('auth.' + l) %></b><span><%= t('auth.' + d) %></span></label>
+        <% }) %>
+      </div>
+    </fieldset>
+    <div class="fields2">
+      <div class="field"><label class="l" for="r-ent"><%= t('auth.nomeEntidade') %></label><input class="input" id="r-ent" name="entity" value="<%= form.entity || '' %>" required maxlength="160"></div>
+      <div class="field"><label class="l" for="r-nif"><%= t('auth.nif') %> <span class="muted">(<%= lang === 'es' ? 'obligatorio para empresas' : 'obrigatório para empresas' %>)</span></label><input class="input" id="r-nif" name="nif" value="<%= form.nif || '' %>" maxlength="30"></div>
+      <div class="field"><label class="l" for="r-n"><%= t('auth.nomeResp') %></label><input class="input" id="r-n" name="name" value="<%= form.name || '' %>" required autocomplete="name"></div>
+      <div class="field"><label class="l" for="r-e"><%= t('auth.email') %></label><input class="input" id="r-e" name="email" type="email" value="<%= form.email || '' %>" required autocomplete="email"></div>
+      <div class="field"><label class="l" for="r-p"><%= t('auth.password') %></label><input class="input" id="r-p" name="password" type="password" required minlength="8" autocomplete="new-password" aria-describedby="r-ph"><p class="help" id="r-ph"><%= t('auth.politicaPass') %></p></div>
+      <div class="field"><label class="l" for="r-p2"><%= t('auth.confirmPass') %></label><input class="input" id="r-p2" name="password2" type="password" required autocomplete="new-password"></div>
+    </div>
+    <%- include('partials/captcha', { form: 'register', captcha }) %>
+    <label class="check" style="margin-bottom:22px"><input type="checkbox" name="terms" value="1" required> <span><%= t('auth.aceito') %> <a href="/termos" target="_blank"><%= t('foot.termos') %></a> · <a href="/privacidade" target="_blank"><%= t('foot.privacidade') %></a></span></label>
+    <button class="btn" style="padding:15px 30px"><%= t('btn.registar') %></button>
+  </form>
+  <% } %>
+</div>
+<%- include('partials/foot') %>

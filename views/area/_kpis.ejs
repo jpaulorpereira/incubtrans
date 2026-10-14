@@ -1,0 +1,9 @@
+<% const delta = (d) => d == null ? '' : `<span class="delta ${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '+' : ''}${d}%</span>`; %>
+<div class="grid4" style="margin-bottom:24px">
+  <% if (typeof first !== 'undefined') { %>
+  <div class="card kpi-card"><div class="top"><%= first.label %><span class="ic"><%- icon(first.icon, 20) %></span></div><div class="v"><%= first.value %></div><div class="how"><span class="pill blue"><%= lang === 'es' ? 'Plataforma' : 'Plataforma' %></span> <%= first.how %></div></div>
+  <% } %>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.visualizacoes') %><span class="ic"><%- icon('eye', 20) %></span></div><div class="v"><%= U.formatNumber(stats.views) %></div><div class="how"><%- delta(stats.dViews) %> <%= t('lbl.ultimos') %> <%= stats.days %> <%= t('lbl.dias') %></div></div>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.contactosN') %><span class="ic"><%- icon('chat', 20) %></span></div><div class="v"><%= U.formatNumber(stats.contacts) %></div><div class="how"><%- delta(stats.dContacts) %> <%= lang === 'es' ? 'Clics en teléfono, email, web y redes' : 'Cliques em telefone, email, website e redes' %></div></div>
+  <div class="card kpi-card"><div class="top"><%= t('lbl.taxaContacto') %><span class="ic"><%- icon('trend', 20) %></span></div><div class="v"><%= U.formatPct(stats.rate) %></div><div class="how"><span class="pill violet"><%= lang === 'es' ? 'Calculado' : 'Calculado' %></span> <%= lang === 'es' ? 'Contactos ÷ visualizaciones' : 'Contactos ÷ visualizações' %></div></div>
+</div>

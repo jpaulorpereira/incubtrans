@@ -1,0 +1,42 @@
+<%- include('_head') %>
+<section class="card pad">
+  <h2 style="font-size:21px"><%= tr('Contas e validação de perfis', 'Cuentas y validación de perfiles') %></h2>
+  <p class="muted" style="margin:6px 0 18px"><%= tr('Aprove ou rejeite os registos, atribua o selo "Verificado" às empresas (NIF/CIF, sede ou atividade na Eurorregião e contactos confirmados), suspenda ou remova contas. O selo é revisto anualmente.', 'Aprueba o rechaza los registros, asigna el sello "Verificado" a las empresas (NIF/CIF, sede o actividad en la Eurorregión y contactos confirmados), suspende o elimina cuentas. El sello se revisa anualmente.') %></p>
+  <% const n = (r, s) => tally.filter(x => (!r || x.role === r) && (!s || x.status === s)).reduce((a, b) => a + b.n, 0); %>
+  <div class="filters-row">
+    <a href="/gestao/contas" class="<%= !query.perfil && !query.estado ? 'on' : '' %>"><%= t('lbl.todos') %><small><%= n() %></small></a>
+    <% ['pendente', 'aprovada', 'suspensa', 'rejeitada'].forEach(s => { %><a href="<%= qs({ estado: s }) %>" class="<%= query.estado === s ? 'on' : '' %>"><%= statusLabel(s) %><small><%= n(null, s) %></small></a><% }) %>
+    <a href="<%= qs({ estado: 'revalidar' }) %>" class="<%= query.estado === 'revalidar' ? 'on' : '' %>"><%= tr('Selo a rever', 'Sello a revisar') %><small><%= counts.reval %></small></a>
+    <span style="width:12px"></span>
+    <% ['empresa', 'incubadora', 'agente'].forEach(r => { %><a href="<%= qs({ perfil: query.perfil === r ? '' : r }) %>" class="<%= query.perfil === r ? 'on' : '' %>"><%= t('lbl.' + r) %><small><%= n(r) %></small></a><% }) %>
+  </div>
+  <form method="get" class="row" style="margin-bottom:16px"><% ['perfil', 'estado'].forEach(k => { if (query[k]) { %><input type="hidden" name="<%= k %>" value="<%= query[k] %>"><% } }) %><input class="input" name="q" value="<%= query.q || '' %>" placeholder="<%= t('btn.pesquisar') %>…" style="max-width:320px"><button class="btn ghost sm"><%= t('btn.pesquisar') %></button></form>
+  <div class="table-wrap"><table class="t">
+    <thead><tr><th><%= tr('Entidade', 'Entidad') %></th><th><%= t('lbl.tipo') %></th><th><%= tr('Registo', 'Registro') %></th><th><%= tr('Estado', 'Estado') %></th><th><%= tr('Selo', 'Sello') %></th><th class="actions"><%= tr('Ações', 'Acciones') %></th></tr></thead>
+    <tbody>
+    <% if (!rows.length) { %><tr><td colspan="6" class="muted"><%= t('lbl.semDados') %></td></tr><% } %>
+    <% rows.forEach(r => { %>
+      <tr>
+        <td><a href="/gestao/contas/<%= r.id %>"><b><%= r.entity_name %></b></a><div class="tiny muted"><%= r.email %><%= r.email_verified ? '' : ' · ' + tr('email por confirmar', 'email sin confirmar') %></div></td>
+        <td><%= t('lbl.' + r.type) %></td>
+        <td class="small"><%= U.formatDate(r.created_at) %></td>
+        <td><span class="pill <%= r.status %>"><%= statusLabel(r.status) %></span><% if (r.status_reason) { %><div class="tiny muted" style="max-width:200px"><%= r.status_reason %></div><% } %></td>
+        <td class="small"><% if (r.type !== 'empresa') { %>—<% } else if (r.isVerified) { %><span class="verified"><%= t('lbl.verificado') %> · <%= U.formatDate(r.verified_at) %></span><% } else if (r.needs_revalidation || r.verified) { %><span class="pill pendente"><%= tr('A rever', 'A revisar') %></span><% } else { %><span class="muted"><%= tr('Sem selo', 'Sin sello') %></span><% } %></td>
+        <td class="actions">
+          <% if (r.status === 'pendente') { %>
+            <form method="post" action="/gestao/contas/<%= r.id %>/aprovar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><% if (r.type === 'empresa') { %><input type="hidden" name="verify" value="1"><% } %><button class="btn ok sm" title="<%= r.type === 'empresa' ? tr('Aprova e atribui o selo Verificado', 'Aprueba y asigna el sello Verificado') : '' %>"><%= tr('Aprovar', 'Aprobar') %></button></form>
+            <a class="btn danger sm" href="/gestao/contas/<%= r.id %>#rejeitar"><%= tr('Rejeitar', 'Rechazar') %></a>
+          <% } else if (r.status === 'aprovada') { %>
+            <% if (r.type === 'empresa' && !r.isVerified) { %><form method="post" action="/gestao/contas/<%= r.id %>/verificar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn ok sm"><%= tr('Validar selo', 'Validar sello') %></button></form><% } %>
+            <a class="btn ghost sm" href="/gestao/contas/<%= r.id %>#suspender"><%= tr('Suspender', 'Suspender') %></a>
+          <% } else { %>
+            <form method="post" action="/gestao/contas/<%= r.id %>/reativar" class="inline"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn ghost sm"><%= tr('Reativar', 'Reactivar') %></button></form>
+          <% } %>
+          <a class="btn ghost sm" href="/gestao/contas/<%= r.id %>"><%= t('btn.editar') %></a>
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+</section>
+<%- include('_foot') %>

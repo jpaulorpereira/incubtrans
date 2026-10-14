@@ -1,0 +1,41 @@
+<% const isInc = type === 'incubadora'; const base = isInc ? '/incubadoras' : '/agentes'; %>
+<%- include('partials/head', { band: { title: t(isInc ? 'nav.incubadoras' : 'nav.agentes'), sub: t(isInc ? 'home.incubS' : 'home.agentS') } }) %>
+<div class="wrap page">
+  <div class="listing">
+    <form class="card filters" method="get" action="<%= base %>" role="search">
+      <h2><%= t('btn.filtrar') %></h2>
+      <div class="f"><label class="l" for="f-q"><%= t('btn.pesquisar') %></label><input class="input" id="f-q" name="q" value="<%= f.q %>" type="search"></div>
+      <div class="f"><label class="l" for="f-a"><%= isInc ? t('lbl.especializacoes') : t('lbl.areasAtuacao') %></label>
+        <select class="input" id="f-a" name="area"><option value=""><%= t('lbl.todos') %></option><% areas.forEach(a => { %><option <%= f.area === a ? 'selected' : '' %>><%= a %></option><% }) %></select></div>
+      <div class="f"><label class="l" for="f-l"><%= t('lbl.localizacao') %></label>
+        <select class="input" id="f-l" name="local"><option value=""><%= t('lbl.todos') %></option>
+          <% ['Portugal', 'Espanha'].forEach(cn => { const rs = regions.filter(r => r.country === cn); if (!rs.length) return; %>
+            <optgroup label="<%= country(cn) %>"><option value="<%= cn %>" <%= f.region === cn ? 'selected' : '' %>><%= country(cn) %> — <%= t('lbl.todos').toLowerCase() %></option><% rs.forEach(r => { %><option value="<%= r.region %>" <%= f.region === r.region ? 'selected' : '' %>><%= r.region %></option><% }) %></optgroup>
+          <% }) %>
+        </select></div>
+      <input type="hidden" name="vista" value="<%= view %>">
+      <button class="btn block"><%= t('btn.filtrar') %></button>
+      <% if (f.q || f.area || f.region) { %><a class="btn light block" style="margin-top:10px" href="<%= base %>"><%= t('btn.limpar') %></a><% } %>
+    </form>
+    <div>
+      <div class="toolbar">
+        <span class="count" role="status"><%= result.total %> <%= result.total === 1 ? t('lbl.resultado') : t('lbl.resultados') %></span>
+        <div class="right">
+          <form method="get" action="<%= base %>" class="row" style="gap:8px">
+            <% Object.entries(query).filter(([k]) => !['ordem', 'pagina'].includes(k)).forEach(([k, v]) => { %><input type="hidden" name="<%= k %>" value="<%= v %>"><% }) %>
+            <label class="muted small" for="ord"><%= t('lbl.ordenar') %></label>
+            <select class="input js-autosubmit" id="ord" name="ordem" style="width:auto;padding:9px 12px">
+              <% [['', 'recentes'], ['nome', 'nomeAZ'], ['antigos', 'antigos']].forEach(([v, l]) => { %><option value="<%= v %>" <%= (f.sort || '') === v ? 'selected' : '' %>><%= t('lbl.' + l) %></option><% }) %>
+            </select>
+            <noscript><button class="btn sm">OK</button></noscript>
+          </form>
+          <div class="seg" role="group"><a href="<%= qs({ vista: 'grelha' }) %>" class="<%= view === 'grelha' ? 'on' : '' %>"><%- icon('grid', 16) %><span class="sr"><%= t('lbl.grelha') %></span></a><a href="<%= qs({ vista: 'lista' }) %>" class="<%= view === 'lista' ? 'on' : '' %>"><%- icon('list', 16) %><span class="sr"><%= t('lbl.lista') %></span></a></div>
+        </div>
+      </div>
+      <% if (!result.rows.length) { %><div class="card empty"><%= t('lbl.semResultados') %></div><% } %>
+      <div class="<%= view === 'lista' ? 'list-view' : 'grid2' %>"><% result.rows.forEach(e => { %><%- include('partials/entity-card', { e }) %><% }) %></div>
+      <%- include('partials/pager', { result }) %>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>
